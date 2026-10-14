@@ -1,0 +1,36 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.contenedor {
+  flex: 1;
+}
+
+.menu {
+  width: 260px;
+}
+
+// El contenido ocupa todo el alto disponible y empuja el pie hacia abajo,
+// para que en pantallas cortas el footer no quede flotando a la mitad.
+.contenido {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.pantalla {
+  flex: 1;
+  padding: 24px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .pantalla {
+    padding: 16px;
+  }
+}

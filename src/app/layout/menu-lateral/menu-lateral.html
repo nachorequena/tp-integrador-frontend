@@ -1,0 +1,38 @@
+<mat-nav-list>
+  <a
+    mat-list-item
+    routerLink="/"
+    routerLinkActive="activo"
+    [routerLinkActiveOptions]="{ exact: true }"
+    (click)="navego.emit()"
+  >
+    <mat-icon matListItemIcon>home</mat-icon>
+    <span matListItemTitle>Inicio</span>
+  </a>
+
+  @if (sesion.haySesion()) {
+    <a mat-list-item routerLink="/perfil" routerLinkActive="activo" (click)="navego.emit()">
+      <mat-icon matListItemIcon>account_circle</mat-icon>
+      <span matListItemTitle>Mi perfil</span>
+    </a>
+
+    <mat-divider></mat-divider>
+    <h3 matSubheader>{{ tituloSeccion() }}</h3>
+
+    @for (opcion of opcionesDelRol(); track opcion.ruta) {
+      <a mat-list-item [routerLink]="opcion.ruta" routerLinkActive="activo" (click)="navego.emit()">
+        <mat-icon matListItemIcon>{{ opcion.icono }}</mat-icon>
+        <span matListItemTitle>{{ opcion.etiqueta }}</span>
+      </a>
+    }
+  } @else {
+    <a mat-list-item routerLink="/login" routerLinkActive="activo" (click)="navego.emit()">
+      <mat-icon matListItemIcon>login</mat-icon>
+      <span matListItemTitle>Iniciar sesión</span>
+    </a>
+    <a mat-list-item routerLink="/registro" routerLinkActive="activo" (click)="navego.emit()">
+      <mat-icon matListItemIcon>person_add</mat-icon>
+      <span matListItemTitle>Registrarse</span>
+    </a>
+  }
+</mat-nav-list>

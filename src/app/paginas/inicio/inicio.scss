@@ -1,0 +1,74 @@
+.presentacion {
+  padding: 32px;
+  margin-bottom: 24px;
+  border-radius: 24px;
+  // secondary-container y no primary-container: con la paleta cyan, el
+  // primario claro es demasiado saturado para un bloque tan grande.
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+
+  h1 {
+    font: var(--mat-sys-headline-medium);
+    margin: 0 0 8px;
+  }
+
+  p {
+    font: var(--mat-sys-body-large);
+    margin: 0;
+    max-width: 60ch;
+  }
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+h2 {
+  font: var(--mat-sys-title-large);
+}
+
+.grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+mat-card-title {
+  font: var(--mat-sys-title-medium);
+}
+
+.acceso {
+  text-decoration: none;
+
+  mat-card {
+    height: 100%;
+    transition: background-color 150ms;
+  }
+
+  &:hover mat-card,
+  &:focus-visible mat-card {
+    background: var(--mat-sys-surface-container-high);
+  }
+
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    font: var(--mat-sys-title-medium);
+    color: var(--mat-sys-on-surface);
+  }
+
+  mat-icon {
+    color: var(--mat-sys-primary);
+  }
+}
+
+@media (max-width: 600px) {
+  .presentacion {
+    padding: 20px;
+  }
+}

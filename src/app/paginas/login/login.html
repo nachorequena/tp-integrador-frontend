@@ -1,0 +1,59 @@
+<mat-card class="tarjeta-formulario" appearance="outlined">
+  @if (enviando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  <mat-card-header>
+    <mat-icon mat-card-avatar>login</mat-icon>
+    <mat-card-title>Iniciar sesión</mat-card-title>
+    <mat-card-subtitle>Ingresá con tu DNI y tu contraseña</mat-card-subtitle>
+  </mat-card-header>
+
+  <form [formGroup]="formulario" (ngSubmit)="ingresar()">
+    <mat-card-content>
+      @if (error()) {
+        <p class="error-servidor" role="alert">
+          <mat-icon>error</mat-icon>
+          {{ error() }}
+        </p>
+      }
+
+      <mat-form-field appearance="outline">
+        <mat-label>DNI</mat-label>
+        <input matInput formControlName="dni" inputmode="numeric" autocomplete="username" />
+        @if (formulario.controls.dni.hasError('required')) {
+          <mat-error>Ingresá tu DNI.</mat-error>
+        } @else if (formulario.controls.dni.hasError('pattern')) {
+          <mat-error>El DNI solo lleva números, sin puntos.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          formControlName="password"
+          [type]="verPassword() ? 'text' : 'password'"
+          autocomplete="current-password"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="verPassword.set(!verPassword())"
+          [attr.aria-label]="verPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
+          <mat-icon>{{ verPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+        @if (formulario.controls.password.hasError('required')) {
+          <mat-error>Ingresá tu contraseña.</mat-error>
+        }
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-flat-button type="submit" [disabled]="enviando()">Ingresar</button>
+      <a mat-button routerLink="/registro">No tengo cuenta, quiero registrarme</a>
+    </mat-card-actions>
+  </form>
+</mat-card>

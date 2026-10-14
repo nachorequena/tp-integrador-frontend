@@ -1,0 +1,38 @@
+<mat-card class="tarjeta-formulario" appearance="outlined">
+  @if (cargando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  <mat-card-header>
+    <mat-icon mat-card-avatar>account_circle</mat-icon>
+    <mat-card-title>Mi perfil</mat-card-title>
+    @if (usuario(); as usuario) {
+      <mat-card-subtitle>{{ usuario.nombre }} {{ usuario.apellido }}</mat-card-subtitle>
+    }
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (error()) {
+      <p class="error-servidor" role="alert">
+        <mat-icon>error</mat-icon>
+        {{ error() }}
+        <button mat-button type="button" (click)="cargar()">Reintentar</button>
+      </p>
+    }
+
+    @if (usuario()) {
+      <mat-list>
+        @for (dato of datos(); track dato.etiqueta; let ultimo = $last) {
+          <mat-list-item>
+            <mat-icon matListItemIcon>{{ dato.icono }}</mat-icon>
+            <span matListItemTitle>{{ dato.valor }}</span>
+            <span matListItemLine>{{ dato.etiqueta }}</span>
+          </mat-list-item>
+          @if (!ultimo) {
+            <mat-divider />
+          }
+        }
+      </mat-list>
+    }
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,40 @@
+<mat-toolbar class="encabezado">
+  <button mat-icon-button (click)="alternarMenu.emit()" aria-label="Abrir o cerrar el menú">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <a routerLink="/" class="marca">
+    <mat-icon>local_hospital</mat-icon>
+    <span class="marca-texto">Clínica Virtual</span>
+  </a>
+
+  <span class="espaciador"></span>
+
+  @if (sesion.usuario()) {
+    <span class="nombre-usuario">{{ nombreCompleto() }}</span>
+
+    <button
+      mat-icon-button
+      [matTooltip]="tipoDeUsuario()"
+      [attr.aria-label]="tipoDeUsuario()"
+    >
+      <mat-icon>info</mat-icon>
+    </button>
+
+    <!-- Ubicada por consigna; la funcionalidad llega en la semana 3. -->
+    <button
+      mat-icon-button
+      matTooltip="Notificaciones (disponible próximamente)"
+      aria-label="Notificaciones"
+    >
+      <mat-icon>notifications</mat-icon>
+    </button>
+
+    <button mat-button (click)="cerrarSesion()" class="boton-salir">
+      <mat-icon>logout</mat-icon>
+      <span class="texto-salir">Cerrar sesión</span>
+    </button>
+  } @else {
+    <span class="bienvenida">Bienvenido a la clínica virtual</span>
+  }
+</mat-toolbar>

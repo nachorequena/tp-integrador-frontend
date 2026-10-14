@@ -1,0 +1,35 @@
+<footer class="pie">
+  <div class="columnas">
+    <section>
+      <h3>{{ clinica.nombre }}</h3>
+      <p class="dato">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ clinica.sede }}: {{ clinica.direccion }}</span>
+      </p>
+    </section>
+
+    <section>
+      <h3>Contacto</h3>
+      <p class="dato">
+        <mat-icon>call</mat-icon>
+        <a [href]="'tel:' + clinica.telefono">{{ clinica.telefono }}</a>
+      </p>
+      <p class="dato">
+        <mat-icon>mail</mat-icon>
+        <a [href]="'mailto:' + clinica.correo">{{ clinica.correo }}</a>
+      </p>
+    </section>
+
+    <section>
+      <h3>Redes sociales</h3>
+      @for (red of clinica.redes; track red.nombre) {
+        <p class="dato">
+          <mat-icon>public</mat-icon>
+          <span>{{ red.nombre }}: {{ red.usuario }}</span>
+        </p>
+      }
+    </section>
+  </div>
+
+  <p class="legal">© {{ anio }} {{ clinica.nombre }}</p>
+</footer>

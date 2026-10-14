@@ -1,0 +1,59 @@
+.encabezado {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  gap: 4px;
+
+  // Se pinta con las variables del propio toolbar y no con `background` y
+  // `color`: el toolbar le pasa su color de texto a los botones que contiene,
+  // y así "Cerrar sesión" se lee sobre el fondo primario. Los botones de solo
+  // ícono no heredan ese color, por eso llevan su variable aparte.
+  --mat-toolbar-container-background-color: var(--mat-sys-primary);
+  --mat-toolbar-container-text-color: var(--mat-sys-on-primary);
+  --mat-icon-button-icon-color: var(--mat-sys-on-primary);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+  font: var(--mat-sys-title-large);
+}
+
+.espaciador {
+  flex: 1;
+}
+
+.nombre-usuario,
+.bienvenida {
+  font: var(--mat-sys-body-large);
+  margin-right: 4px;
+}
+
+// En pantallas angostas no entra todo: se esconden los textos y quedan los
+// íconos, que siguen teniendo su tooltip y su aria-label.
+@media (max-width: 720px) {
+  .marca-texto,
+  .texto-salir {
+    display: none;
+  }
+
+  .nombre-usuario {
+    font: var(--mat-sys-body-medium);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 40vw;
+  }
+
+  // El saludo lo pide la consigna textual: se parte en dos renglones antes
+  // que cortarlo con puntos suspensivos.
+  .bienvenida {
+    font: var(--mat-sys-body-medium);
+    white-space: normal;
+    text-align: right;
+    line-height: 1.2;
+  }
+}

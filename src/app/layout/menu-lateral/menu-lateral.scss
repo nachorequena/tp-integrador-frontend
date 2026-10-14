@@ -1,0 +1,6 @@
+// Resalta la opción de la pantalla actual, para que el usuario sepa dónde está.
+.activo {
+  background: var(--mat-sys-secondary-container);
+  --mat-list-list-item-label-text-color: var(--mat-sys-on-secondary-container);
+  --mat-list-list-item-leading-icon-color: var(--mat-sys-on-secondary-container);
+}

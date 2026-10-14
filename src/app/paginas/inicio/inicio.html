@@ -1,0 +1,60 @@
+@if (sesion.usuario(); as usuario) {
+  <section class="presentacion">
+    <h1>Hola, {{ usuario.nombre }}</h1>
+    <p>Elegí una función del menú para empezar.</p>
+  </section>
+
+  <div class="grilla">
+    @for (acceso of accesos(); track acceso.ruta) {
+      <a class="acceso" [routerLink]="acceso.ruta">
+        <mat-card appearance="outlined">
+          <mat-card-content>
+            <mat-icon>{{ acceso.icono }}</mat-icon>
+            <span>{{ acceso.etiqueta }}</span>
+          </mat-card-content>
+        </mat-card>
+      </a>
+    }
+    <a class="acceso" routerLink="/perfil">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <mat-icon>account_circle</mat-icon>
+          <span>Mi perfil</span>
+        </mat-card-content>
+      </mat-card>
+    </a>
+  </div>
+} @else {
+  <section class="presentacion">
+    <h1>Tus turnos médicos, sin llamadas ni esperas</h1>
+    <p>
+      Iniciá sesión o creá tu cuenta de paciente para gestionar tu atención en la clínica desde
+      donde estés.
+    </p>
+    <div class="acciones">
+      <a mat-flat-button routerLink="/login">
+        <mat-icon>login</mat-icon>
+        Iniciar sesión
+      </a>
+      <a mat-stroked-button routerLink="/registro">
+        <mat-icon>person_add</mat-icon>
+        Registrarme
+      </a>
+    </div>
+  </section>
+
+  <h2>Con tu cuenta de paciente vas a poder</h2>
+  <div class="grilla">
+    @for (funcionalidad of funcionalidades; track funcionalidad.titulo) {
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>{{ funcionalidad.icono }}</mat-icon>
+          <mat-card-title>{{ funcionalidad.titulo }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ funcionalidad.descripcion }}</p>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+}
