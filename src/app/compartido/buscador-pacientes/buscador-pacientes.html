@@ -1,9 +1,9 @@
 <!-- Buscador de pacientes: campo + botón (dispara buscar()), y la lista de
      resultados donde cada ítem llama a elegir(). -->
-<form class="barra-filtros" (ngSubmit)="buscar()">
+<form class="barra-filtros" [formGroup]="formulario" (ngSubmit)="buscar()">
   <mat-form-field appearance="outline">
     <mat-label>DNI o apellido</mat-label>
-    <input matInput [formControl]="busqueda" autocomplete="off" />
+    <input matInput formControlName="busqueda" autocomplete="off" />
     @if (busqueda.hasError('required')) {
       <mat-error>Ingresá un DNI o un apellido.</mat-error>
     } @else if (busqueda.hasError('minlength')) {

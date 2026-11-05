@@ -18,7 +18,7 @@
  */
 
 import { Component, inject, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -56,7 +56,7 @@ export interface DatosDialogoTexto {
   template: `
     <h2 mat-dialog-title>{{ datos.titulo }}</h2>
     <!-- El submit llama a guardar(); el error del backend queda visible acá. -->
-    <form (ngSubmit)="guardar()">
+    <form [formGroup]="formulario" (ngSubmit)="guardar()">
       <mat-dialog-content class="formulario-dialogo">
         @if (guardando()) {
           <mat-progress-bar mode="indeterminate" />
@@ -69,7 +69,7 @@ export interface DatosDialogoTexto {
         }
         <mat-form-field appearance="outline">
           <mat-label>{{ datos.etiqueta }}</mat-label>
-          <input matInput [formControl]="campo" [attr.maxlength]="datos.maximo" />
+          <input matInput formControlName="campo" [attr.maxlength]="datos.maximo" />
           <mat-hint align="end">{{ campo.value.length }} / {{ datos.maximo }}</mat-hint>
           @if (campo.hasError('required')) {
             <mat-error>Este campo es obligatorio.</mat-error>
@@ -93,6 +93,12 @@ export class DialogoTexto {
     nonNullable: true,
     validators: [Validators.required, textoNoVacio, Validators.maxLength(this.datos.maximo)],
   });
+
+  /**
+   * Grupo que envuelve al campo: sin `[formGroup]` en el `<form>`, Angular no
+   * intercepta el envío y el navegador recarga la página al tocar "Guardar".
+   */
+  protected readonly formulario = new FormGroup({ campo: this.campo });
 
   protected readonly guardando = signal(false);
   protected readonly error = signal<string | null>(null);
