@@ -5,6 +5,10 @@
  * Deciden si se puede entrar a una ruta según haya o no una sesión iniciada.
  * Corren ANTES de cargar la pantalla, así que también protegen las URLs
  * escritas a mano en la barra de direcciones.
+ *
+ * Con qué se conecta: `sesionGuard` protege `/perfil` y las secciones de rol
+ * en `app.routes.ts`; `invitadoGuard`, `/login` y `/registro`. Leen
+ * `SesionService` y mandan a `paginas/login` (con `?volver=`) o al inicio.
  */
 
 import { inject } from '@angular/core';

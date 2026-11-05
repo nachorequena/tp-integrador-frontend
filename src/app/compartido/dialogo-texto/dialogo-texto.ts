@@ -11,6 +11,10 @@
  * Igual que `dialogo-sede`, guarda él mismo (con la función `guardar` que le
  * pasa la pantalla) para poder mostrar el error del backend sin cerrarse. Se
  * cierra con `true` si se guardó.
+ *
+ * Con qué se conecta: lo abren `paginas/admin/especialidades` y
+ * `paginas/admin/coberturas`, que le pasan en `guardar` la llamada a su
+ * servicio.
  */
 
 import { Component, inject, signal } from '@angular/core';

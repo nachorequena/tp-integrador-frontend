@@ -9,6 +9,11 @@
  * Lee dos parámetros opcionales de la URL:
  *   - `?volver=` lo pone `sesionGuard` al rebotar a alguien sin sesión;
  *   - `?dni=` lo pone el registro, para no hacer tipear el DNI de nuevo.
+ *
+ * Con qué se conecta: ruta `/login` (con `invitadoGuard`). Llama a
+ * `AuthService.login` (`POST /auth/login`) y abre la sesión con
+ * `SesionService.iniciar`. A esta pantalla mandan `sesionGuard` y el
+ * interceptor cuando el token vence.
  */
 
 import { Component, inject, input, OnInit, signal } from '@angular/core';

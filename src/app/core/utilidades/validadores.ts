@@ -4,6 +4,11 @@
  *
  * Los que Angular no trae. Replican reglas del backend para avisarle al
  * usuario ANTES de enviar, en el mismo campo donde está el problema.
+ *
+ * Con qué se conecta: `textoNoVacio` y `maxBytes` los usan casi todos los
+ * formularios; `coincidenCampos`, `formulario-paciente` y
+ * `paginas/paciente/mis-datos`; `salidaPosteriorAEntrada`,
+ * `compartido/dialogo-rango`.
  */
 
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';

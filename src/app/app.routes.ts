@@ -24,6 +24,10 @@
  * `MENU_POR_ROL` (`core/navegacion/menu.ts`), que dice para cada opción del
  * menú qué componente cargar. Agregar una pantalla de rol es agregar una
  * opción a esa lista.
+ *
+ * Con qué se conecta: lo registra `app.config.ts` (`provideRouter`). Usa los
+ * guards de `core/guards/` y `MENU_POR_ROL` de `core/navegacion/menu.ts`, que
+ * dice qué pantalla de `paginas/` carga cada opción de cada rol.
  */
 
 import { Route, Routes } from '@angular/router';

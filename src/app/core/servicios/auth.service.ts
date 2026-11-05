@@ -9,6 +9,11 @@
  * Todas las respuestas llegan envueltas en `{ codigo, estado, datos }`; acá se
  * desenvuelven con `map` para que los componentes reciban directamente los
  * datos. Los errores HTTP siguen de largo y los maneja quien se suscribe.
+ *
+ * Con qué se conecta: lo usan `paginas/login` (login), `paginas/registro` (a
+ * través de `compartido/formulario-paciente`) y `paginas/perfil` y
+ * `paginas/paciente/mis-datos` (perfil). La URL base sale de
+ * `environments/environment.ts`.
  */
 
 import { HttpClient } from '@angular/common/http';

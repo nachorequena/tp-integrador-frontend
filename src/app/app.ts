@@ -8,6 +8,11 @@
  *
  * El menú se adapta al ancho: en escritorio queda fijo al costado, y en
  * celulares se superpone al contenido y se abre con el botón del encabezado.
+ *
+ * Con qué se conecta: lo arranca `main.ts`. Su template (`app.html`) arma
+ * `layout/encabezado`, `layout/menu-lateral`, el `router-outlet` (donde el
+ * router de `app.routes.ts` dibuja cada pantalla de `paginas/`) y
+ * `layout/pie`.
  */
 
 import { BreakpointObserver } from '@angular/cdk/layout';

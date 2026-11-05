@@ -5,6 +5,9 @@
  * Datos de contacto de la clínica: dirección de la sede, redes sociales,
  * teléfono y correo, como pide la consigna. Los datos salen de
  * `core/config/clinica.ts` (ver ahí por qué no se piden a la API).
+ *
+ * Con qué se conecta: lo dibuja `app.html` debajo de cada pantalla; los datos
+ * salen de `core/config/clinica.ts`.
  */
 
 import { Component } from '@angular/core';

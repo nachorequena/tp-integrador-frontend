@@ -4,6 +4,8 @@
  *
  * Se muestra para cualquier URL que no coincida con ninguna ruta (la ruta
  * comodín `**`, que va última en `app.routes.ts`).
+ *
+ * Con qué se conecta: ruta comodín `**` de `app.routes.ts` (va última).
  */
 
 import { Component } from '@angular/core';

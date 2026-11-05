@@ -18,6 +18,10 @@
  *
  * Marcar una como leída actualiza el signal en el momento (el contador baja
  * al instante) y recién después confirma contra el backend.
+ *
+ * Con qué se conecta: lo lee `layout/encabezado` (campana); llaman a
+ * `cargar()` `paginas/nuevo-turno`, `paginas/turnos-del-dia` y
+ * `paginas/paciente/mis-turnos`. Depende de `SesionService` y del `Router`.
  */
 
 import { HttpClient } from '@angular/common/http';

@@ -9,6 +9,9 @@
  * Dirección y teléfono son los de la Sede Centro (id 1) del script de la base
  * `clinica_ampliada.sql`. La base no tiene correo ni redes sociales de la
  * clínica, así que esos dos datos son de ejemplo.
+ *
+ * Con qué se conecta: lo usa `layout/pie` para mostrar los datos de contacto,
+ * que se ven también sin sesión (por eso no se piden a la API).
  */
 
 /** Una red social de la clínica. */

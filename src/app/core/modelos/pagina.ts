@@ -6,6 +6,9 @@
  * `GET /auditoria`). La consumen las pantallas de usuarios y auditoría junto
  * con el `mat-paginator`, que necesita el `total` para saber cuántas páginas
  * hay.
+ *
+ * Con qué se conecta: lo usan `UsuarioService` y `AuditoriaService`, y las
+ * pantallas `paginas/admin/usuarios` y `paginas/admin/auditoria`.
  */
 
 /**

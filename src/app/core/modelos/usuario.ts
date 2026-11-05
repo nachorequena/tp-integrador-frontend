@@ -6,6 +6,11 @@
  * (que a su vez son las columnas de la tabla `usuario`). Por eso aparecen
  * `fecha_nacimiento` o `id_cobertura` con guion bajo: renombrarlos obligaría a
  * traducir en cada servicio y abriría la puerta a errores.
+ *
+ * Con qué se conecta: lo usan `AuthService`, `SesionService`,
+ * `UsuarioService`, `PacienteService`, el encabezado (nombre y tipo de
+ * usuario), los guards y las pantallas de login, registro, perfil, usuarios y
+ * mis datos.
  */
 
 /** Los cuatro roles que existen en la base, tal cual están en la columna `rol`. */

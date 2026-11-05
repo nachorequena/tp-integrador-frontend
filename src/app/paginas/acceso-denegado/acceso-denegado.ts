@@ -4,6 +4,9 @@
  *
  * Adonde manda `rolGuard` a quien intenta entrar a la sección de otro rol (por
  * ejemplo, un paciente que escribe `/admin/sedes` en la barra de direcciones).
+ *
+ * Con qué se conecta: ruta `/acceso-denegado` de `app.routes.ts`; a esta
+ * pantalla manda `rolGuard` cuando el rol no corresponde.
  */
 
 import { Component } from '@angular/core';

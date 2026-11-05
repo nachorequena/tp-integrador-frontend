@@ -10,6 +10,10 @@
  *     registros de los turnos que atendió él (`paginas/medico/historial`). El
  *     filtro lo aplica el backend, no la interfaz: así no hay forma de ver
  *     registros ajenos ni modificando el código del navegador.
+ *
+ * Con qué se conecta: lo usan `paginas/paciente/historial` y
+ * `paginas/medico/historial`, que muestran los registros con
+ * `compartido/lista-historial`.
  */
 
 import { HttpClient } from '@angular/common/http';

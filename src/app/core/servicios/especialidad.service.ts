@@ -8,6 +8,10 @@
  *     médicos, filtros).
  *   - `crear()`, `actualizar()`, `eliminar()` → solo administrador (pantalla
  *     `paginas/admin/especialidades`).
+ *
+ * Con qué se conecta: lo usan `paginas/admin/especialidades`,
+ * `paginas/admin/usuarios` (especialidades del médico) y `paginas/nuevo-turno`
+ * (primer paso).
  */
 
 import { HttpClient } from '@angular/common/http';
