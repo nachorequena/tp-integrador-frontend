@@ -5,6 +5,10 @@
  * El backend responde SIEMPRE con esta forma, tanto en éxito como en error
  * (es el formato uniforme que exige el enunciado general). Tiparlo una vez
  * acá permite que cada servicio declare solo qué viene en `datos`.
+ *
+ * Con qué se conecta: lo usan todos los servicios de `core/servicios/` para
+ * tipar la respuesta antes de desenvolverla con `datosDe()`
+ * (`core/utilidades/http.ts`).
  */
 
 /**

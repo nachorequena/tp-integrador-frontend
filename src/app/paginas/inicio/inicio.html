@@ -1,3 +1,5 @@
+<!-- Inicio: sin sesión, presentación y accesos a login/registro; con sesión,
+     saludo y accesos directos a las opciones del rol (accesos() de inicio.ts). -->
 @if (sesion.usuario(); as usuario) {
   <section class="presentacion">
     <h1>Hola, {{ usuario.nombre }}</h1>

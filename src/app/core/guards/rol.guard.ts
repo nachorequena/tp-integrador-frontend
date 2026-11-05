@@ -10,6 +10,10 @@
  * Esto es una comodidad para el usuario, no la seguridad real: cualquiera
  * puede modificar el código del navegador. Lo que de verdad protege los datos
  * es el backend, que valida el token y el rol en cada petición.
+ *
+ * Con qué se conecta: lo usa `app.routes.ts` en cada sección de rol
+ * (`seccionDeRol`), después de `sesionGuard`. Lee el rol de `SesionService` y,
+ * si no corresponde, manda a `paginas/acceso-denegado`.
  */
 
 import { inject } from '@angular/core';

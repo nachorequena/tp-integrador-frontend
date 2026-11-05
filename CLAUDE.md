@@ -17,12 +17,15 @@
   2. **Frontend** — Angular 21 + Angular Material 21. **← este repositorio.**
 - La consigna pide **un repositorio aparte del backend**, con una rama por entrega:
   `entrega-frontend-1`, `entrega-frontend-2`, etc.
-- Las consignas se liberan semana a semana y están en `docs/` (si falta un PDF, pedíselo al humano).
+- Las consignas están en `docs/`. La **consigna final** (`docs/Frontend-enunciado-completo.pdf`)
+  reemplazó a las semanas 2, 3 y 4 y se entregó de una sola vez en la rama **`entrega-frontend`**.
+- Mapa del código: `docs/ARQUITECTURA.md` (recorrido menú → ruta → guard → pantalla → servicio →
+  API, y tabla de qué usa cada pantalla).
 
 ## 2. 🚨 Regla de oro: no adelantarse
 
-- Solo lo que pide la semana en curso. Las opciones de semanas futuras pueden quedar visibles en el
-  menú apuntando a "En construcción" (lo permite la consigna de la semana 1).
+- Solo lo que pide la consigna vigente. Con la entrega final **ya no queda ninguna opción "En
+  construcción"** (la consigna lo prohíbe): esa pantalla se borró.
 - **El backend ya entregado no se toca por iniciativa propia.** Si el front necesita algo que la API
   no da, **preguntá antes**. Las ramas `entrega-backend-N` no se modifican nunca; los cambios
   autorizados van a `main` del backend.
@@ -41,7 +44,8 @@
 
 - **Todos los componentes de interfaz se resuelven con Angular Material** (formularios, botones,
   tablas, diálogos, menús, íconos, avisos). No uses HTML crudo donde exista un componente Material.
-- **No agregues dependencias sin preguntar.**
+- **No agregues dependencias sin preguntar.** Autorizada: **Chart.js 4** (gráficos de reportes; la
+  consigna deja elegir la librería y pide nombrarla en el README).
 - La app es **zoneless** (default de Angular 21): el estado que se ve en pantalla va en `signal`s.
 - ⚠️ El npm global del humano es 11.3.0 y tiene un bug (`edgesOut`) al instalar dependencias
   nuevas. Si `npm install` falla así, usá el npm incluido en Node:
@@ -79,16 +83,27 @@ src/app/
 │   ├── config/clinica.ts         # datos de contacto del footer
 │   ├── guards/                   # sesionGuard, invitadoGuard, rolGuard(...roles)
 │   ├── interceptores/            # tokenInterceptor: Bearer + cierre de sesión ante 401
-│   ├── modelos/                  # Usuario, Rol, Cobertura, RespuestaApi<T>
+│   ├── modelos/                  # un archivo por recurso de la API (turno, agenda, sede...)
 │   ├── navegacion/menu.ts        # MENU_POR_ROL: fuente única de menú y rutas por rol
-│   ├── servicios/                # auth, cobertura, sesion (único que toca localStorage)
-│   └── utilidades/               # validadores, adaptador de fechas, mensajeDeError
+│   ├── servicios/                # uno por recurso + sesion (único que toca localStorage)
+│   │                             #   + notificacion (estado de la campana con signals)
+│   └── utilidades/               # validadores, fechas, mensajeDeError, http (datosDe,
+│                                 #   aParametros), textos del paginador, horarios (grilla 30')
+├── compartido/                   # diálogos, buscador de pacientes, formulario de paciente,
+│                                 #   rangos de agenda, lista de historial, gráfico de barras
 ├── layout/                       # encabezado, menu-lateral, pie
 └── paginas/                      # una carpeta por pantalla
 ```
 
-**Agregar una pantalla de una semana nueva:** crear su carpeta en `paginas/` y, si es una opción
-del menú, reemplazar en `app.routes.ts` el `EnConstruccion` de esa ruta por el componente nuevo.
+**Agregar una pantalla de rol:** crear su carpeta en `paginas/` y agregar la opción en
+`MENU_POR_ROL` (`core/navegacion/menu.ts`) con su `cargar: () => import(...)`. `seccionDeRol` en
+`app.routes.ts` genera la ruta y la protege sola. Lo que se reutiliza entre pantallas va en
+`compartido/`.
+
+Pantallas compartidas entre roles (miran `SesionService.rol()` y se adaptan): `paginas/agendas`
+(médico, operador, admin), `paginas/turnos-del-dia` (médico, operador), `paginas/nuevo-turno`
+(paciente, operador). El formulario de paciente (`compartido/formulario-paciente`) lo usan el
+registro y el operador.
 
 ## 6. Contrato con la API
 
@@ -119,6 +134,36 @@ Están en el `README.md`. Requieren haber corrido `scripts/usuarios-prueba.sql` 
 - ❌ Tocar el backend sin preguntar.
 
 ## 9. Bitácora (actualizar al final de cada sesión, lo más reciente arriba)
+
+### Entrega final (consigna "Frontend — Semanas 2 a 4")
+
+- **Estado:** ✅ Completa. `ng build` sin errores ni avisos; recorrido en el navegador con los
+  cuatro roles contra el backend real (MySQL 8.3 en modo estricto).
+- **Rama:** `entrega-frontend` (frontend) y `entrega-frontend` (backend, con los cambios de API).
+- **Origen:** se descartó el repo paralelo de un compañero (no partía de la semana 1); todo se
+  implementó desde la consigna sobre esta base.
+- **Hecho:** las pantallas de los cuatro roles (ver README §4), campana de notificaciones,
+  componentes compartidos, `MENU_POR_ROL` con la pantalla de cada opción, `LOCALE_ID es-AR`,
+  paginador en español, Chart.js.
+- **Verificado:** turno pedido con el horario ocupado mientras tanto (409 → mensaje y vuelta al paso
+  de horario); contador de la campana al confirmar, atender y marcar leída; médico con turnos de dos
+  sedes y atención con historial; recorte de rango con turnos → mensaje del backend y papelera
+  deshabilitada; operador sin acciones en otra sede, "Nueva agenda" para un médico sin agenda en su
+  sede, ojo → turnos confirmados; alta de paciente por el operador (repetir contraseña) y asignación
+  de turno; baja de sede con dependencias → mensaje; alta de médico → auditoría; reportes con rango;
+  URL de otro rol → acceso denegado; token inválido → login; backend apagado → mensaje y Reintentar.
+- **Decisiones:**
+  - **Horas de agenda en un `mat-select` cada 30 minutos** (la duración del turno del backend), así
+    los rangos siempre calzan con la grilla.
+  - **Fechas y horarios del pedido de turno como chips** (`mat-chip-listbox`): se ven todas las
+    opciones disponibles de un vistazo, sin abrir un calendario con días deshabilitados.
+  - **Los diálogos guardan ellos mismos** (sede, rango, usuario, atención): si el backend rechaza,
+    el error se ve en el diálogo sin perder lo cargado.
+  - **El color del gráfico se resuelve en el navegador**: `--mat-sys-primary` usa `light-dark()` y
+    Chart.js lo pintaba negro.
+  - **El rol no se cambia al editar un usuario** (el backend lo rechaza).
+  - **El admin tiene "Agendas médicas"** (estaba en el menú de la semana 1) con edición en todas
+    las sedes; no tiene el ojo porque los turnos no son parte de su rol.
 
 ### Semana 1 — Setup, Angular Material y autenticación
 

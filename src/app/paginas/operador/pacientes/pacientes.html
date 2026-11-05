@@ -1,0 +1,38 @@
+<section class="pagina">
+  <header class="encabezado-pagina">
+    <h1>Pacientes</h1>
+  </header>
+
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      <mat-tab-group>
+        <!-- Buscar: elegir un paciente lo lleva a asignarle un turno (asignarTurno). -->
+        <mat-tab label="Buscar y asignar turno">
+          <div class="contenido-pestania">
+            <p>Buscá al paciente por DNI o apellido y elegilo para asignarle un turno.</p>
+            <app-buscador-pacientes (elegido)="asignarTurno($event)" />
+          </div>
+        </mat-tab>
+
+        <!-- Alta: mismo formulario que el registro de la semana 1, guardando
+             con crearPaciente() → POST /pacientes. -->
+        <mat-tab label="Alta de paciente">
+          <div class="contenido-pestania">
+            @if (creado(); as nuevo) {
+              <p class="aviso">
+                <mat-icon>check_circle</mat-icon>
+                Se creó a {{ nuevo.apellido }}, {{ nuevo.nombre }} (DNI {{ nuevo.dni }}).
+                <button mat-button (click)="asignarTurno(nuevo)">Asignarle un turno</button>
+              </p>
+            }
+            <app-formulario-paciente
+              [guardar]="crearPaciente"
+              textoBoton="Dar de alta"
+              (guardado)="alCrear($event)"
+            />
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</section>

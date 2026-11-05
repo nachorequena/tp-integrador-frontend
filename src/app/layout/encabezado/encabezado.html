@@ -1,4 +1,5 @@
 <mat-toolbar class="encabezado">
+  <!-- Botón que abre/cierra el menú lateral (lo maneja app.ts vía alternarMenu). -->
   <button mat-icon-button (click)="alternarMenu.emit()" aria-label="Abrir o cerrar el menú">
     <mat-icon>menu</mat-icon>
   </button>
@@ -13,22 +14,63 @@
   @if (sesion.usuario()) {
     <span class="nombre-usuario">{{ nombreCompleto() }}</span>
 
-    <button
-      mat-icon-button
-      [matTooltip]="tipoDeUsuario()"
-      [attr.aria-label]="tipoDeUsuario()"
-    >
+    <button mat-icon-button [matTooltip]="tipoDeUsuario()" [attr.aria-label]="tipoDeUsuario()">
       <mat-icon>info</mat-icon>
     </button>
 
-    <!-- Ubicada por consigna; la funcionalidad llega en la semana 3. -->
+    <!-- Campana: el badge muestra las no leídas y se oculta en 0. Al abrir el
+         menú se recarga el listado (notificaciones.cargar()). -->
     <button
       mat-icon-button
-      matTooltip="Notificaciones (disponible próximamente)"
+      [matMenuTriggerFor]="menuNotificaciones"
+      (menuOpened)="notificaciones.cargar()"
+      [matBadge]="notificaciones.noLeidas()"
+      [matBadgeHidden]="notificaciones.noLeidas() === 0"
+      matBadgeColor="warn"
+      matTooltip="Notificaciones"
       aria-label="Notificaciones"
     >
       <mat-icon>notifications</mat-icon>
     </button>
+
+    <mat-menu #menuNotificaciones="matMenu" class="menu-notificaciones" xPosition="before">
+      <div class="titulo-notificaciones" (click)="$event.stopPropagation()">Notificaciones</div>
+      <mat-divider />
+
+      @if (notificaciones.error()) {
+        <p class="error-servidor mensaje-menu" role="alert">{{ notificaciones.error() }}</p>
+      }
+
+      <!-- De la más reciente a la más antigua (así las ordena el backend).
+           Las no leídas llevan la clase no-leida y el botón para marcarlas. -->
+      @for (notificacion of notificaciones.items(); track notificacion.id) {
+        <div
+          class="notificacion"
+          [class.no-leida]="!notificacion.leida"
+          (click)="$event.stopPropagation()"
+        >
+          <mat-icon class="icono-notificacion">
+            {{ notificacion.leida ? 'drafts' : 'mark_email_unread' }}
+          </mat-icon>
+          <div class="texto-notificacion">
+            <span>{{ notificacion.mensaje }}</span>
+            <small>{{ deFechaHoraApi(notificacion.fecha) }}</small>
+          </div>
+          @if (!notificacion.leida) {
+            <button
+              mat-icon-button
+              matTooltip="Marcar como leída"
+              aria-label="Marcar como leída"
+              (click)="marcarLeida($event, notificacion.id)"
+            >
+              <mat-icon>done</mat-icon>
+            </button>
+          }
+        </div>
+      } @empty {
+        <p class="mensaje-menu">No tenés notificaciones.</p>
+      }
+    </mat-menu>
 
     <button mat-button (click)="cerrarSesion()" class="boton-salir">
       <mat-icon>logout</mat-icon>

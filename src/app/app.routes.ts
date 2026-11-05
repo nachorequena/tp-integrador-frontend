@@ -19,6 +19,15 @@
  *
  * Las pantallas se cargan con `loadComponent` (carga diferida): el código de
  * cada una se descarga recién cuando alguien entra, y la app arranca más rápido.
+ *
+ * Las pantallas de cada rol NO se listan acá una por una: salen de
+ * `MENU_POR_ROL` (`core/navegacion/menu.ts`), que dice para cada opción del
+ * menú qué componente cargar. Agregar una pantalla de rol es agregar una
+ * opción a esa lista.
+ *
+ * Con qué se conecta: lo registra `app.config.ts` (`provideRouter`). Usa los
+ * guards de `core/guards/` y `MENU_POR_ROL` de `core/navegacion/menu.ts`, que
+ * dice qué pantalla de `paginas/` carga cada opción de cada rol.
  */
 
 import { Route, Routes } from '@angular/router';
@@ -30,9 +39,11 @@ import { Rol } from './core/modelos/usuario';
 /**
  * Arma la sección de rutas de un rol a partir de sus opciones de menú.
  *
- * Cada opción de `MENU_POR_ROL` se convierte en una ruta hija. Por ahora todas
- * muestran "En construcción"; cuando una semana implemente su pantalla, se
- * reemplaza el componente de esa ruta.
+ * Cada opción de `MENU_POR_ROL` se convierte en una ruta hija que carga la
+ * pantalla indicada en `opcion.cargar`. Los dos guards protegen a TODAS las
+ * hijas: sin sesión se va al login, y con sesión de otro rol se va a "Acceso
+ * denegado" (cumple "cada pantalla solo es accesible para los roles que
+ * corresponden, tanto desde el menú como escribiendo la URL a mano").
  *
  * @param rol Rol dueño de la sección; también es el prefijo de la URL.
  * @returns La ruta `/<rol>` con sus hijas y sus guards.
@@ -49,9 +60,7 @@ function seccionDeRol(rol: Rol): Route {
         (opcion): Route => ({
           path: opcion.segmento,
           title: `${opcion.etiqueta} | Clínica Virtual`,
-          data: { titulo: opcion.etiqueta },
-          loadComponent: () =>
-            import('./paginas/en-construccion/en-construccion').then((m) => m.EnConstruccion),
+          loadComponent: opcion.cargar,
         }),
       ),
     ],

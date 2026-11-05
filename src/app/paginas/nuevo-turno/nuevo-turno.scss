@@ -1,0 +1,16 @@
+// Estilos propios de la solicitud de turno.
+
+// Los selectores de cada paso no ocupan todo el ancho de la tarjeta.
+.campo-paso {
+  width: 420px;
+}
+
+.titulo-resumen {
+  font: var(--mat-sys-title-medium);
+  margin: 16px 0 8px;
+}
+
+mat-chip-listbox {
+  display: block;
+  margin-bottom: 8px;
+}

@@ -6,6 +6,11 @@
  * (que a su vez son las columnas de la tabla `usuario`). Por eso aparecen
  * `fecha_nacimiento` o `id_cobertura` con guion bajo: renombrarlos obligaría a
  * traducir en cada servicio y abriría la puerta a errores.
+ *
+ * Con qué se conecta: lo usan `AuthService`, `SesionService`,
+ * `UsuarioService`, `PacienteService`, el encabezado (nombre y tipo de
+ * usuario), los guards y las pantallas de login, registro, perfil, usuarios y
+ * mis datos.
  */
 
 /** Los cuatro roles que existen en la base, tal cual están en la columna `rol`. */
@@ -59,6 +64,49 @@ export interface DatosRegistro {
   /** Formato `YYYY-MM-DD`. */
   fecha_nacimiento: string;
   id_cobertura: number;
+}
+
+/**
+ * Usuario tal como lo devuelve el listado del administrador (`GET /usuarios`),
+ * con los nombres de sede y cobertura resueltos y los ids de las
+ * especialidades (solo los médicos tienen).
+ */
+export interface UsuarioListado extends Usuario {
+  sede: string | null;
+  cobertura: string | null;
+  especialidades: number[];
+}
+
+/**
+ * Cuerpo de `POST /usuarios` y `PUT /usuarios/:id` (pantalla de usuarios del
+ * administrador).
+ *
+ * - `password` es obligatoria en el alta y opcional en la edición.
+ * - `id_sede` solo aplica a operador y médico; `id_cobertura` solo a paciente;
+ *   `especialidades` solo a médico. El backend ignora lo que no corresponde.
+ */
+export interface DatosUsuarioAdmin {
+  nombre: string;
+  apellido: string;
+  dni: string;
+  email: string;
+  telefono: string;
+  fecha_nacimiento: string;
+  rol: Rol;
+  password?: string;
+  id_sede?: number | null;
+  id_cobertura?: number | null;
+  especialidades?: number[];
+}
+
+/** Filtros y página del listado de usuarios. */
+export interface FiltrosUsuarios {
+  nombre?: string;
+  apellido?: string;
+  rol?: Rol;
+  id_sede?: number;
+  pagina?: number;
+  limite?: number;
 }
 
 /** Nombre legible de cada rol, para mostrarlo en pantalla. */

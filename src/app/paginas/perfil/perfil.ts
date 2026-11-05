@@ -8,6 +8,10 @@
  *
  * El perfil trae `id_cobertura` pero no su nombre, así que para los pacientes
  * se cruza con el listado público de coberturas.
+ *
+ * Con qué se conecta: ruta `/perfil` (con `sesionGuard`), a la que lleva "Mi
+ * perfil" del menú lateral. Usa `AuthService.perfil` (`GET /auth/perfil`) y
+ * `CoberturaService.listarDisponibles`.
  */
 
 import { Component, computed, inject, OnInit, signal } from '@angular/core';

@@ -8,6 +8,10 @@
  *
  * Además cierra la sesión si el backend responde 401 a una petición que sí
  * llevaba token: significa que el token venció o dejó de ser válido.
+ *
+ * Con qué se conecta: lo registra `app.config.ts` (`withInterceptors`), así
+ * pasa por acá toda petición de los servicios de `core/servicios/`. Lee el
+ * token de `SesionService` y la URL base de `environments/environment.ts`.
  */
 
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';

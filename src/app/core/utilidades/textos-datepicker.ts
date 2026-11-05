@@ -7,6 +7,10 @@
  * y aparecen como tooltip, así que se traducen para que toda la app esté en
  * español. Se registra en el componente que usa el datepicker (ver por qué
  * en `registro.ts`).
+ *
+ * Con qué se conecta: lo proveen en su propio `providers` los componentes con
+ * datepicker: `formulario-paciente`, `dialogo-rango`, `dialogo-usuario`,
+ * `agendas`, `turnos-del-dia`, `auditoria` y `reportes`.
  */
 
 import { Injectable } from '@angular/core';

@@ -1,0 +1,52 @@
+<!-- Alta o modificación de una sede. El submit llama a guardar(). -->
+<h2 mat-dialog-title>{{ sede ? 'Modificar sede' : 'Nueva sede' }}</h2>
+
+<form [formGroup]="formulario" (ngSubmit)="guardar()">
+  <mat-dialog-content class="formulario-dialogo">
+    @if (guardando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+    @if (error()) {
+      <p class="error-servidor" role="alert">
+        <mat-icon>error</mat-icon>
+        {{ error() }}
+      </p>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" />
+      @if (formulario.controls.nombre.hasError('required')) {
+        <mat-error>Ingresá el nombre.</mat-error>
+      } @else if (formulario.controls.nombre.hasError('maxlength')) {
+        <mat-error>Máximo 50 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Dirección</mat-label>
+      <input matInput formControlName="direccion" />
+      @if (formulario.controls.direccion.hasError('required')) {
+        <mat-error>Ingresá la dirección.</mat-error>
+      } @else if (formulario.controls.direccion.hasError('maxlength')) {
+        <mat-error>Máximo 100 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Teléfono</mat-label>
+      <input matInput formControlName="telefono" inputmode="tel" maxlength="15" />
+      <mat-hint>Solo números, hasta 15</mat-hint>
+      @if (formulario.controls.telefono.hasError('required')) {
+        <mat-error>Ingresá el teléfono.</mat-error>
+      } @else if (formulario.controls.telefono.hasError('pattern')) {
+        <mat-error>Solo números, hasta 15.</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="guardando()">Guardar</button>
+  </mat-dialog-actions>
+</form>

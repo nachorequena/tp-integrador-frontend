@@ -83,3 +83,60 @@ export function deFechaApi(fechaApi: string): string {
   const [anio, mes, dia] = fechaApi.split('-');
   return `${dia}/${mes}/${anio}`;
 }
+
+/**
+ * Convierte una fecha de la API (`YYYY-MM-DD`) en un `Date` a la medianoche
+ * LOCAL, para cargarla en un datepicker.
+ *
+ * Es la inversa de `aFechaApi`. No se usa `new Date('YYYY-MM-DD')`, que la lee
+ * como UTC y en Argentina daría el día anterior.
+ *
+ * @param fechaApi Fecha tal como la manda el backend.
+ * @returns El `Date` correspondiente a ese día.
+ */
+export function aDate(fechaApi: string): Date {
+  const [anio, mes, dia] = fechaApi.split('-').map(Number);
+  return new Date(anio, mes - 1, dia);
+}
+
+/**
+ * Fecha de hoy en el formato de la API. Es el valor por defecto de los filtros
+ * de fecha (agenda del médico, turnos del día, agenda del operador).
+ *
+ * @returns Hoy como `YYYY-MM-DD`, según el reloj de esta computadora.
+ */
+export function hoyApi(): string {
+  return aFechaApi(new Date());
+}
+
+/**
+ * Calcula la edad en años cumplidos a partir de la fecha de nacimiento.
+ *
+ * La usa la tabla de turnos del médico ("edad calculada a partir de la fecha
+ * de nacimiento", dice la consigna). Resta los años y le saca uno si este año
+ * todavía no llegó el cumpleaños.
+ *
+ * @param fechaNacimiento Fecha `YYYY-MM-DD` de la API.
+ * @param hoy Fecha de referencia (por defecto, hoy). Existe para poder probarla.
+ * @returns La edad en años.
+ */
+export function calcularEdad(fechaNacimiento: string, hoy: Date = new Date()): number {
+  const [anio, mes, dia] = fechaNacimiento.split('-').map(Number);
+  let edad = hoy.getFullYear() - anio;
+  const yaCumplio =
+    hoy.getMonth() + 1 > mes || (hoy.getMonth() + 1 === mes && hoy.getDate() >= dia);
+  if (!yaCumplio) edad--;
+  return edad;
+}
+
+/**
+ * Pasa una fecha y hora del backend (`YYYY-MM-DD HH:MM:SS`) al formato local
+ * `dd/mm/aaaa HH:MM`. La usan la auditoría y la campana de notificaciones.
+ *
+ * @param fechaHora Texto tal como lo manda la API (columnas `datetime`).
+ * @returns Por ejemplo `04/11/2026 22:46`.
+ */
+export function deFechaHoraApi(fechaHora: string): string {
+  const [fecha, hora = ''] = fechaHora.split(' ');
+  return `${deFechaApi(fecha)} ${hora.slice(0, 5)}`.trim();
+}

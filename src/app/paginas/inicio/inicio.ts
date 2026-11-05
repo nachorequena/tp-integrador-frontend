@@ -7,6 +7,10 @@
  *     hacer un paciente registrado;
  *   - con sesión: saluda e invita a elegir una función del menú, mostrando
  *     las mismas opciones del menú como accesos directos.
+ *
+ * Con qué se conecta: ruta `/` de `app.routes.ts`. Lee `SesionService` y arma
+ * los accesos directos con `MENU_POR_ROL` y `rutaDeOpcion`
+ * (`core/navegacion/menu.ts`), los mismos del menú lateral.
  */
 
 import { Component, computed, inject } from '@angular/core';

@@ -1,0 +1,140 @@
+<section class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <h1>Reportes y estadísticas</h1>
+      <p>Todos los indicadores se calculan sobre el mismo rango de fechas.</p>
+    </div>
+  </header>
+
+  <!-- Rango de fechas: "Actualizar" → actualizar() recalcula los cuatro a la vez. -->
+  <mat-card appearance="outlined" class="tarjeta-rango">
+    <mat-card-content>
+      <form class="barra-filtros" [formGroup]="rango" (ngSubmit)="actualizar()">
+        <mat-form-field appearance="outline">
+          <mat-label>Desde</mat-label>
+          <input matInput [matDatepicker]="calDesde" formControlName="desde" placeholder="dd/mm/aaaa" />
+          <mat-datepicker-toggle matIconSuffix [for]="calDesde" />
+          <mat-datepicker #calDesde />
+          @if (rango.controls.desde.hasError('matDatepickerParse')) {
+            <mat-error>Fecha inválida.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Hasta</mat-label>
+          <input matInput [matDatepicker]="calHasta" formControlName="hasta" placeholder="dd/mm/aaaa" />
+          <mat-datepicker-toggle matIconSuffix [for]="calHasta" />
+          <mat-datepicker #calHasta />
+          @if (rango.controls.hasta.hasError('matDatepickerParse')) {
+            <mat-error>Fecha inválida.</mat-error>
+          }
+        </mat-form-field>
+        <button mat-flat-button type="submit">
+          <mat-icon>refresh</mat-icon>
+          Actualizar
+        </button>
+        <button mat-button type="button" (click)="verTodo()">Ver todo el histórico</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  @if (cargando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  @if (error()) {
+    <p class="error-servidor" role="alert">
+      <mat-icon>error</mat-icon>
+      {{ error() }}
+      <button mat-button (click)="actualizar()">Reintentar</button>
+    </p>
+  } @else if (indicadores(); as datos) {
+    <!-- Tasa de cancelación en tres tarjetas de métricas. -->
+    <div class="metricas">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <span class="valor-metrica">{{ datos.cancelacion.total }}</span>
+          <span class="etiqueta-metrica">Turnos en el período</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <span class="valor-metrica">{{ datos.cancelacion.cancelados }}</span>
+          <span class="etiqueta-metrica">Turnos cancelados</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <span class="valor-metrica">{{ datos.cancelacion.tasa | percent: '1.0-1' }}</span>
+          <span class="etiqueta-metrica">Tasa de cancelación</span>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    @if (datos.cancelacion.total === 0) {
+      <p class="aviso">
+        <mat-icon>info</mat-icon>
+        No hay turnos en el rango elegido: los gráficos se muestran en cero.
+      </p>
+    }
+
+    <!-- Gráficos de barras (compartido/grafico-barras, Chart.js). -->
+    <div class="graficos">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Turnos por especialidad</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <app-grafico-barras
+            titulo="Turnos por especialidad"
+            [etiquetas]="etiquetasEspecialidad()"
+            [valores]="valoresEspecialidad()"
+          />
+        </mat-card-content>
+      </mat-card>
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Turnos por sede</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <app-grafico-barras
+            titulo="Turnos por sede"
+            [etiquetas]="etiquetasSede()"
+            [valores]="valoresSede()"
+          />
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Ranking de médicos por turnos atendidos. -->
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Ranking de médicos por turnos atendidos</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (datos.ranking.length === 0) {
+          <div class="estado-vacio">
+            <mat-icon>leaderboard</mat-icon>
+            <span>No hay médicos para mostrar.</span>
+          </div>
+        } @else {
+          <table mat-table [dataSource]="datos.ranking" class="tabla-completa">
+            <ng-container matColumnDef="posicion">
+              <th mat-header-cell *matHeaderCellDef>#</th>
+              <td mat-cell *matCellDef="let fila; let i = index">{{ i + 1 }}</td>
+            </ng-container>
+            <ng-container matColumnDef="medico">
+              <th mat-header-cell *matHeaderCellDef>Médico</th>
+              <td mat-cell *matCellDef="let fila">{{ fila.medico }}</td>
+            </ng-container>
+            <ng-container matColumnDef="atendidos">
+              <th mat-header-cell *matHeaderCellDef>Turnos atendidos</th>
+              <td mat-cell *matCellDef="let fila">{{ fila.atendidos }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="columnasRanking"></tr>
+            <tr mat-row *matRowDef="let fila; columns: columnasRanking"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</section>

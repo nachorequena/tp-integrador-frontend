@@ -1,0 +1,53 @@
+<!-- Historial clínico de la consulta. El submit llama a guardar(). -->
+<h2 mat-dialog-title>
+  Marcar como atendido
+  <small class="subtitulo-dialogo">
+    · {{ turno.paciente }} · {{ deFechaApi(turno.fecha) }} {{ turno.hora }}
+  </small>
+</h2>
+
+<form [formGroup]="formulario" (ngSubmit)="guardar()">
+  <mat-dialog-content class="formulario-dialogo">
+    @if (guardando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+    @if (error()) {
+      <p class="error-servidor" role="alert">
+        <mat-icon>error</mat-icon>
+        {{ error() }}
+      </p>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Diagnóstico</mat-label>
+      <textarea matInput formControlName="diagnostico" rows="3"></textarea>
+      <mat-hint align="end">{{ formulario.controls.diagnostico.value.length }} / {{ maximo }}</mat-hint>
+      @if (formulario.controls.diagnostico.hasError('required')) {
+        <mat-error>El diagnóstico es obligatorio.</mat-error>
+      } @else if (formulario.controls.diagnostico.hasError('maxlength')) {
+        <mat-error>Máximo {{ maximo }} caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tratamiento (opcional)</mat-label>
+      <textarea matInput formControlName="tratamiento" rows="2"></textarea>
+      @if (formulario.controls.tratamiento.hasError('maxlength')) {
+        <mat-error>Máximo {{ maximo }} caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Observaciones (opcional)</mat-label>
+      <textarea matInput formControlName="observaciones" rows="2"></textarea>
+      @if (formulario.controls.observaciones.hasError('maxlength')) {
+        <mat-error>Máximo {{ maximo }} caracteres.</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="guardando()">Marcar como atendido</button>
+  </mat-dialog-actions>
+</form>
