@@ -21,6 +21,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SesionService } from '../servicios/sesion.service';
+import { mensajeDeError } from '../utilidades/mensaje-error';
 
 /**
  * Agrega `Authorization: Bearer <token>` a las peticiones dirigidas a la API.
@@ -63,7 +64,10 @@ export const tokenInterceptor: HttpInterceptorFn = (peticion, siguiente) => {
       //   - `conToken !== peticion`: este pedido sí llevaba token.
       if (error instanceof HttpErrorResponse && error.status === 401 && conToken !== peticion) {
         sesion.cerrar(); // borra token y usuario guardados
-        avisos.open('Tu sesión expiró. Volvé a iniciar sesión.', 'Cerrar', { duration: 5000 });
+        // El cartel muestra el motivo que mandó el backend ("El token expiró",
+        // "Tus datos de acceso cambiaron (rol o sede)..."), traducido por
+        // `mensajeDeError`.
+        avisos.open(mensajeDeError(error), 'Cerrar', { duration: 6000 });
         router.navigate(['/login']); // lleva al login (lo pide la consigna)
       }
       // En TODOS los casos el error se vuelve a lanzar (`throwError`), para
