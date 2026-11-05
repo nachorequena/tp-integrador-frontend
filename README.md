@@ -36,6 +36,22 @@ envoltorios) en `src/app/compartido/grafico-barras`. Se eligió porque es livian
 importar por partes (solo se registran las piezas del gráfico de barras) y funciona con Angular 21
 sin adaptadores.
 
+### Tecnologías y librerías del frontend
+
+| Tecnología / librería | Versión | Para qué se usa |
+| --- | --- | --- |
+| **Angular** (`@angular/core`, `common`, `router`, `forms`, `platform-browser`) | 21.2 | Framework de la aplicación: componentes standalone, signals, ruteo con guards, formularios reactivos, `HttpClient` e interceptores. |
+| **Angular Material** (`@angular/material`) | 21.2.14 | Todos los componentes visuales: tablas (`mat-table`), paginador, diálogos, stepper, formularios (`mat-form-field`, `mat-select`, datepicker), chips, badge, menú, snackbar, barra de progreso, tarjetas y botones. |
+| **Angular CDK** (`@angular/cdk`) | 21.2.14 | Base de Angular Material (overlays, accesibilidad, layout). Lo requiere Material. |
+| **Material Icons** (Google Fonts) | — | Íconos de toda la app (`<mat-icon>`: campana, lápiz, ojo, tacho, etc.). Se cargan desde `fonts.googleapis.com` en `src/index.html`. |
+| **Roboto** (Google Fonts) | — | Tipografía de la app, la recomendada por Material. También se carga en `src/index.html`. |
+| **Chart.js** (`chart.js`) | 4.6.1 | Gráficos de barras de la pantalla de Reportes (`compartido/grafico-barras`). |
+| **RxJS** (`rxjs`) | 7.8 | Observables: las llamadas HTTP, `forkJoin`, `catchError`, `valueChanges` de los formularios. |
+| **TypeScript** | 5.9.3 | Lenguaje de todo el código. |
+| **Angular CLI / `@angular/build`** | 21.2.26 | `ng serve` y `ng build` (compilación y servidor de desarrollo). |
+| **Vitest** + **jsdom** | 4 / 28 | Ejecutor de pruebas unitarias (`ng test`). |
+| **Prettier** | 3.8 | Formateo del código. |
+
 ---
 
 ## 2. Levantar el sistema completo desde cero

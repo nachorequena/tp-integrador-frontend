@@ -1,13 +1,22 @@
+<!--
+  TEMPLATE DE LA SOLICITUD DE TURNO (lógica en nuevo-turno.ts)
+  ==========================================================
+
+-->
 <section class="pagina">
   <header class="encabezado-pagina">
+    <!-- El título cambia según el rol (esOperador viene del .ts). -->
     <h1>{{ esOperador ? 'Nuevo turno' : 'Solicitar turno' }}</h1>
   </header>
 
   <mat-card appearance="outlined">
+    <!-- Barra de carga: se ve mientras se espera una respuesta de la API. -->
     @if (cargando() || enviando()) {
       <mat-progress-bar mode="indeterminate" />
     }
     <mat-card-content>
+      <!-- Mensaje de error del backend (por ejemplo, "Ese horario ya fue
+           tomado"). error() es una signal del .ts; si es null no se dibuja. -->
       @if (error()) {
         <p class="error-servidor" role="alert">
           <mat-icon>error</mat-icon>
@@ -15,11 +24,15 @@
         </p>
       }
 
-      <!-- Stepper lineal: no se avanza si el paso actual es inválido. -->
+      <!-- Stepper lineal: no se avanza si el paso actual es inválido.
+           Cada <mat-step [stepControl]="formulario"> queda bloqueado hasta que
+           ese formulario del .ts sea válido. -->
       <mat-stepper orientation="vertical" [linear]="true">
-        <!-- Operador: primero el paciente (buscador → elegirPaciente()). -->
+        <!-- Operador: primero el paciente (buscador → elegirPaciente()). El
+             paciente logueado no ve este paso (sale del token). -->
         @if (esOperador) {
           <mat-step [stepControl]="pasoPaciente" label="Paciente">
+            <!-- `as elegido`: guarda el paciente en una variable para usarla adentro. -->
             @if (paciente(); as elegido) {
               <p class="aviso">
                 <mat-icon>person</mat-icon>
@@ -27,32 +40,47 @@
                 {{ elegido.cobertura ?? 'Sin cobertura' }}
               </p>
             }
+            <!-- Componente propio (compartido/buscador-pacientes): le pasamos el
+                 DNI de la URL y, cuando el usuario elige un paciente, su evento
+                 (elegido) llama a elegirPaciente() del .ts con ese paciente. -->
             <app-buscador-pacientes [busquedaInicial]="dni()" (elegido)="elegirPaciente($event)" />
             <div class="acciones-formulario">
+              <!-- matStepperNext: avanza al paso siguiente. Deshabilitado
+                   hasta que haya un paciente elegido. -->
               <button mat-flat-button matStepperNext [disabled]="!paciente()">Siguiente</button>
             </div>
           </mat-step>
         }
 
+        <!-- PASO "ESPECIALIDAD" — formulario pasoEspecialidad del .ts. -->
         <mat-step [stepControl]="pasoEspecialidad" label="Especialidad">
           <form [formGroup]="pasoEspecialidad">
             <mat-form-field appearance="outline" class="campo-paso">
               <mat-label>Especialidad</mat-label>
+              <!-- Lo elegido se guarda en el campo id_especialidad. Al cambiar,
+                   encadenarPasos() del .ts pide los médicos. -->
               <mat-select formControlName="id_especialidad">
+                <!-- Una opción por cada especialidad que trajo la API
+                     (signal especialidades, cargada en cargarCatalogos()).
+                     El valor guardado es el id; lo que se ve, la descripción. -->
                 @for (especialidad of especialidades(); track especialidad.id) {
                   <mat-option [value]="especialidad.id">{{ especialidad.descripcion }}</mat-option>
                 }
               </mat-select>
+              <!-- Mensaje del Validators.required: aparece si el campo quedó vacío. -->
               @if (pasoEspecialidad.controls.id_especialidad.hasError('required')) {
                 <mat-error>Elegí una especialidad.</mat-error>
               }
             </mat-form-field>
             <div class="acciones-formulario">
+              <!-- type="button": así este botón NO envía el formulario, solo avanza. -->
               <button mat-flat-button matStepperNext type="button">Siguiente</button>
             </div>
           </form>
         </mat-step>
 
+        <!-- PASO "SEDE" — formulario pasoSede. Para el operador el campo viene
+             deshabilitado con su sede (ver pasoSede en el .ts). -->
         <mat-step [stepControl]="pasoSede" label="Sede">
           <form [formGroup]="pasoSede">
             <mat-form-field appearance="outline" class="campo-paso">
@@ -70,15 +98,19 @@
               }
             </mat-form-field>
             <div class="acciones-formulario">
+              <!-- matStepperPrevious: vuelve al paso anterior. -->
               <button mat-button matStepperPrevious type="button">Atrás</button>
               <button mat-flat-button matStepperNext type="button">Siguiente</button>
             </div>
           </form>
         </mat-step>
 
-        <!-- Solo médicos de la especialidad y sede elegidas. -->
+        <!-- PASO "MÉDICO": solo médicos de la especialidad y sede elegidas
+             (signal medicos, cargada por cargarMedicos() → GET /medicos). -->
         <mat-step [stepControl]="pasoMedico" label="Médico">
           <form [formGroup]="pasoMedico">
+            <!-- Si ya terminó de cargar y la lista vino vacía, en lugar de un
+                 selector vacío se muestra un mensaje (lo pide la consigna). -->
             @if (!cargando() && medicos().length === 0) {
               <div class="estado-vacio">
                 <mat-icon>person_off</mat-icon>
@@ -104,7 +136,8 @@
           </form>
         </mat-step>
 
-        <!-- Solo fechas con agenda y lugar libre (GET /disponibilidad/fechas). -->
+        <!-- PASO "FECHA": solo fechas con agenda y lugar libre
+             (signal fechas, cargada por cargarFechas() → GET /disponibilidad/fechas). -->
         <mat-step [stepControl]="pasoFecha" label="Fecha">
           <form [formGroup]="pasoFecha">
             @if (!cargando() && fechas().length === 0) {
@@ -113,14 +146,19 @@
                 <span>El médico no tiene fechas disponibles en esta sede. Probá con otro médico o sede.</span>
               </div>
             } @else {
+              <!-- Chips seleccionables: uno por fecha. Al tocar uno, su valor
+                   ("2026-11-06") se guarda en el campo fecha del formulario. -->
               <mat-chip-listbox formControlName="fecha" aria-label="Fechas disponibles">
                 @for (fecha of fechas(); track fecha) {
+                  <!-- aDate convierte el texto en fecha y el pipe date la
+                       muestra como "vie 6/11". -->
                   <mat-chip-option [value]="fecha">{{ aDate(fecha) | date: 'EEE d/MM' }}</mat-chip-option>
                 }
               </mat-chip-listbox>
             }
             <div class="acciones-formulario">
               <button mat-button matStepperPrevious type="button">Atrás</button>
+              <!-- Deshabilitado mientras no haya fecha elegida (pasoFecha inválido). -->
               <button mat-flat-button matStepperNext type="button" [disabled]="pasoFecha.invalid">
                 Siguiente
               </button>
@@ -128,7 +166,8 @@
           </form>
         </mat-step>
 
-        <!-- Solo horarios libres de ese día (GET /disponibilidad/horarios). -->
+        <!-- PASO "HORARIO": solo horarios libres de ese día
+             (signal horarios, cargada por cargarHorarios() → GET /disponibilidad/horarios). -->
         <mat-step [stepControl]="pasoHorario" label="Horario">
           <form [formGroup]="pasoHorario">
             @if (!cargando() && horarios().length === 0) {
@@ -137,6 +176,7 @@
                 <span>No quedan horarios libres ese día. Elegí otra fecha.</span>
               </div>
             } @else {
+              <!-- Un chip por horario libre; el elegido ("09:30") va al campo hora. -->
               <mat-chip-listbox formControlName="hora" aria-label="Horarios libres">
                 @for (horario of horarios(); track horario.hora) {
                   <mat-chip-option [value]="horario.hora">{{ horario.hora }}</mat-chip-option>
@@ -152,13 +192,20 @@
           </form>
         </mat-step>
 
-        <!-- Nota obligatoria + resumen + confirmar() → POST /turnos. -->
+        <!-- PASO FINAL: nota obligatoria + resumen + confirmar() → POST /turnos.
+             (ngSubmit)="confirmar()": al enviar este formulario (botón
+             type="submit" de abajo, o Enter en el campo) se ejecuta confirmar()
+             del .ts. -->
         <mat-step [stepControl]="pasoNota" label="Nota y confirmación">
           <form [formGroup]="pasoNota" (ngSubmit)="confirmar()">
             <mat-form-field appearance="outline" class="campo-paso">
               <mat-label>Nota para el médico</mat-label>
+              <!-- maxlength="40" del HTML impide tipear más de 40; el
+                   Validators.maxLength(40) del .ts lo valida igual. -->
               <input matInput formControlName="nota" maxlength="40" placeholder="Motivo de la consulta" />
+              <!-- Contador de caracteres: largo actual del valor / 40. -->
               <mat-hint align="end">{{ pasoNota.controls.nota.value.length }} / 40</mat-hint>
+              <!-- Un mensaje por cada validación del campo nota. -->
               @if (pasoNota.controls.nota.hasError('required')) {
                 <mat-error>La nota es obligatoria.</mat-error>
               } @else if (pasoNota.controls.nota.hasError('maxlength')) {
@@ -166,10 +213,13 @@
               }
             </mat-form-field>
 
+            <!-- Resumen antes de confirmar (lo pide la consigna). Los datos salen
+                 del computed resumen() del .ts, que pasa los ids a nombres. -->
             <h3 class="titulo-resumen">Resumen del turno</h3>
             <dl class="datos-detalle">
               @if (esOperador) {
                 <dt>Paciente</dt>
+                <!-- `?.`: si todavía no hay paciente, no da error (muestra vacío). -->
                 <dd>{{ paciente()?.apellido }}, {{ paciente()?.nombre }}</dd>
               }
               <dt>Especialidad</dt>
@@ -179,15 +229,20 @@
               <dt>Sede</dt>
               <dd>{{ resumen().sede }}</dd>
               <dt>Fecha</dt>
+              <!-- 'fullDate' muestra la fecha completa: "viernes, 6 de noviembre de 2026". -->
               <dd>{{ resumen().fecha | date: 'fullDate' }}</dd>
               <dt>Hora</dt>
               <dd>{{ resumen().hora }}</dd>
               <dt>Cobertura</dt>
+              <!-- La cobertura no se elige: es la registrada por el paciente. -->
               <dd>{{ resumen().cobertura }}</dd>
             </dl>
 
             <div class="acciones-formulario">
               <button mat-button matStepperPrevious type="button">Atrás</button>
+              <!-- BOTÓN "CONFIRMAR TURNO": type="submit" → dispara (ngSubmit) del
+                   <form> → confirmar(). Deshabilitado mientras se envía, para
+                   evitar que un doble click cree dos pedidos. -->
               <button mat-flat-button type="submit" [disabled]="enviando()">
                 <mat-icon>check</mat-icon>
                 Confirmar turno

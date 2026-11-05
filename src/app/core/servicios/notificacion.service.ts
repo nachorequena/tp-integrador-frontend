@@ -41,21 +41,33 @@ export class NotificacionService {
   private readonly sesion = inject(SesionService);
   private readonly url = `${environment.apiUrl}/notificaciones`;
 
+  // Signals PRIVADAS (con guion bajo): solo este servicio las puede cambiar.
   private readonly _items = signal<Notificacion[]>([]);
   private readonly _error = signal<string | null>(null);
 
-  /** Notificaciones del usuario, de la más reciente a la más antigua. */
+  /**
+   * Notificaciones del usuario, de la más reciente a la más antigua.
+   * `asReadonly()` entrega una versión de solo lectura: el encabezado puede
+   * leerla pero no modificarla por error.
+   */
   readonly items = this._items.asReadonly();
 
   /** Mensaje si la última carga falló (se muestra dentro del menú de la campana). */
   readonly error = this._error.asReadonly();
 
-  /** Cantidad de no leídas: es el número del contador de la campana. */
+  /**
+   * Cantidad de no leídas: es el número del contador de la campana.
+   * `filter` se queda con las que tienen `leida` en 0 y `.length` las cuenta.
+   * Como es un `computed`, se recalcula solo cada vez que cambia `_items`,
+   * y el número de la campana se actualiza sin hacer nada más.
+   */
   readonly noLeidas = computed(() => this._items().filter((n) => !n.leida).length);
 
   constructor() {
     // Reacciona a la sesión: al abrirse carga, al cerrarse vacía. Así un
     // usuario nunca ve el contador del anterior si comparten la computadora.
+    // `effect` ejecuta la función ahora y otra vez cada vez que cambia una
+    // signal que lee adentro (acá, `haySesion()`): login → carga, logout → vacía.
     effect(() => {
       if (this.sesion.haySesion()) {
         this.cargar();
@@ -65,6 +77,10 @@ export class NotificacionService {
       }
     });
 
+    // Además se recarga en cada cambio de pantalla: el router emite un evento
+    // `NavigationEnd` al terminar de navegar. Así, si otro usuario generó una
+    // notificación (por ejemplo el médico atendió el turno), el paciente la ve
+    // la próxima vez que navega (la consigna no pide tiempo real).
     inject(Router)
       .events.pipe(filter((evento) => evento instanceof NavigationEnd))
       .subscribe(() => {
@@ -72,16 +88,23 @@ export class NotificacionService {
       });
   }
 
-  /** Pide el listado al backend (`GET /notificaciones`) y actualiza el estado. */
+  /**
+   * Pide el listado al backend (`GET /notificaciones`) y actualiza el estado.
+   * Es público porque también lo llaman las pantallas después de confirmar,
+   * cancelar o atender un turno (por ejemplo `nuevo-turno.ts → confirmar()`).
+   */
   cargar(): void {
     this.http
       .get<RespuestaApi<Notificacion[]>>(this.url)
       .pipe(datosDe())
       .subscribe({
+        // OK: se reemplaza el listado → `noLeidas` se recalcula → la campana
+        // muestra el número nuevo.
         next: (notificaciones) => {
           this._items.set(notificaciones);
           this._error.set(null);
         },
+        // Error: se guarda el mensaje para mostrarlo dentro del menú.
         error: (error: unknown) => this._error.set(mensajeDeError(error)),
       });
   }
@@ -96,7 +119,12 @@ export class NotificacionService {
    * @param id Id de la notificación.
    */
   marcarLeida(id: number): void {
+    // 1) En pantalla, ya: `update` recibe la lista actual y devuelve una
+    //    nueva donde la notificación con ese id tiene `leida: 1` (las demás
+    //    quedan igual). El contador baja en el mismo instante.
     this._items.update((lista) => lista.map((n) => (n.id === id ? { ...n, leida: 1 } : n)));
+    // 2) Después se avisa al backend. Si sale bien no hay nada más que hacer;
+    //    si falla, se vuelve a pedir el listado real para no mostrar algo falso.
     this.http.patch<RespuestaApi<unknown>>(`${this.url}/${id}/leida`, {}).subscribe({
       error: () => this.cargar(),
     });
