@@ -177,6 +177,22 @@ lugar, [`src/environments/environment.ts`](src/environments/environment.ts)
 | ----------- | ----------------------------------------------- |
 | `ng serve`  | Servidor de desarrollo con recarga automática   |
 | `ng build`  | Compila la versión de producción en `dist/`     |
+| `npm test`  | Corre las pruebas unitarias una vez             |
+
+### 2.4 Pruebas automáticas
+
+```bash
+npm test        # frontend: Vitest (ng test), una sola corrida
+```
+
+Cubren las piezas centrales que usan todas las pantallas:
+- la traducción de errores de la API (`mensajeDeError`);
+- las fechas y la edad;
+- los validadores propios de los formularios;
+- los guards de sesión y de rol (una URL escrita a mano no saltea la protección);
+- el interceptor del token (agrega `Authorization` y, ante un 401, cierra la sesión y lleva al login).
+
+El backend tiene sus propias pruebas (`npm test` en `tp-integrador-programacion`).
 
 ---
 
