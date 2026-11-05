@@ -375,3 +375,13 @@ tr.fila-desplegable {
 .datos-lectura {
   margin-bottom: 24px;
 }
+
+// Contenido de cada paso del `mat-stepper` vertical (solicitud de turno).
+// Material le pone `overflow: hidden` (lo necesita para la animación de
+// abrir/cerrar el paso) y ningún espacio arriba. El label de un campo
+// "outline" flota unos 8px POR ENCIMA del borde del campo, así que el primer
+// campo de cada paso quedaba con el label cortado ("Sede", "Especialidad"...).
+// Va acá (global) porque ese contenedor lo crea el stepper, no el componente.
+.mat-vertical-stepper-content .mat-vertical-content {
+  padding-top: 12px;
+}

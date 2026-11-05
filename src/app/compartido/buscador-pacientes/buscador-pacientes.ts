@@ -16,7 +16,7 @@
  */
 
 import { Component, inject, input, OnInit, output, signal } from '@angular/core';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -55,6 +55,14 @@ export class BuscadorPacientes implements OnInit {
     nonNullable: true,
     validators: [Validators.required, Validators.minLength(2)],
   });
+
+  /**
+   * Grupo que envuelve al campo. Hace falta para el `<form [formGroup]>` del
+   * template: sin un `formGroup`, Angular no intercepta el envío del
+   * formulario, `(ngSubmit)` nunca se dispara y el navegador hace un submit
+   * común que RECARGA la página (el botón "Buscar" parecía no hacer nada).
+   */
+  protected readonly formulario = new FormGroup({ busqueda: this.busqueda });
 
   protected readonly resultados = signal<PacienteEncontrado[] | null>(null);
   protected readonly buscando = signal(false);
