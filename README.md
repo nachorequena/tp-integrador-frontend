@@ -41,7 +41,49 @@ sin adaptadores.
 ## 2. Levantar el sistema completo desde cero
 
 Hace falta tener instalados **Node.js**, **MySQL o MariaDB** (por ejemplo con WAMP/XAMPP) y
-**Git**.
+**Git**. No hace falta instalar Angular CLI globalmente.
+
+### Forma rápida: un comando por carpeta
+
+Con MySQL/MariaDB encendido (WAMP/XAMPP en verde):
+
+```bash
+git clone -b entrega-frontend https://github.com/nachorequena/tp-integrador-programacion.git tp-integrador-backend
+git clone -b entrega-frontend https://github.com/nachorequena/tp-integrador-frontend.git
+
+# Terminal 1
+cd tp-integrador-backend
+npm run iniciar
+
+# Terminal 2 (cuando el backend diga "Servidor escuchando")
+cd tp-integrador-frontend
+npm run iniciar
+```
+
+**Backend (`npm run iniciar`)**, en orden:
+
+1. Instala las dependencias si faltan.
+2. Si no hay `.env`, lo crea:
+   - busca MySQL en los puertos 3306, 3307 y 3308;
+   - si `root` sin contraseña no funciona, te pregunta puerto, usuario y contraseña;
+   - genera el `JWT_SECRET`.
+3. Prepara la base:
+   - si no existe, la crea e importa los tres scripts en orden;
+   - si existe pero no tiene agenda para hoy, actualiza los datos de prueba.
+4. Controla que el puerto 3000 esté libre.
+5. Levanta la API.
+
+**Frontend (`npm run iniciar`)**, en orden:
+
+1. Instala las dependencias si faltan.
+2. Verifica que el backend responda.
+3. Levanta la app y abre el navegador en http://localhost:4200.
+
+Para empezar con una base limpia: `npm run base:reiniciar` en el backend. Borra la base, la recrea
+con los tres scripts y no levanta la API.
+
+Si algo falla, el script dice qué pasó y cómo seguir. Los pasos manuales, por si se prefieren,
+están a continuación.
 
 ### 2.1 Base de datos
 
