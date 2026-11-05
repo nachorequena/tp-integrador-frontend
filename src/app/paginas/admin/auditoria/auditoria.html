@@ -1,0 +1,100 @@
+<section class="pagina">
+  <header class="encabezado-pagina">
+    <div>
+      <h1>Auditoría</h1>
+      <p>Registro de altas, bajas y modificaciones. Solo lectura.</p>
+    </div>
+  </header>
+
+  <mat-card appearance="outlined">
+    @if (cargando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+    <mat-card-content>
+      <!-- Filtros: Buscar → buscar(), Limpiar → limpiar(). -->
+      <form class="barra-filtros" [formGroup]="filtros" (ngSubmit)="buscar()">
+        <mat-form-field appearance="outline">
+          <mat-label>Usuario</mat-label>
+          <input matInput formControlName="usuario" placeholder="Apellido, nombre o DNI" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Entidad</mat-label>
+          <mat-select formControlName="entidad">
+            <mat-option value="">Todas</mat-option>
+            @for (entidad of entidades; track entidad) {
+              <mat-option [value]="entidad">{{ entidad }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Desde</mat-label>
+          <input matInput [matDatepicker]="calDesde" formControlName="desde" placeholder="dd/mm/aaaa" />
+          <mat-datepicker-toggle matIconSuffix [for]="calDesde" />
+          <mat-datepicker #calDesde />
+          @if (filtros.controls.desde.hasError('matDatepickerParse')) {
+            <mat-error>Fecha inválida.</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Hasta</mat-label>
+          <input matInput [matDatepicker]="calHasta" formControlName="hasta" placeholder="dd/mm/aaaa" />
+          <mat-datepicker-toggle matIconSuffix [for]="calHasta" />
+          <mat-datepicker #calHasta />
+          @if (filtros.controls.hasta.hasError('matDatepickerParse')) {
+            <mat-error>Fecha inválida.</mat-error>
+          }
+        </mat-form-field>
+        <button mat-flat-button type="submit">
+          <mat-icon>search</mat-icon>
+          Buscar
+        </button>
+        <button mat-button type="button" (click)="limpiar()">Limpiar</button>
+      </form>
+
+      @if (error()) {
+        <p class="error-servidor" role="alert">
+          <mat-icon>error</mat-icon>
+          {{ error() }}
+        </p>
+      } @else if (!cargando() && entradas().length === 0) {
+        <div class="estado-vacio">
+          <mat-icon>manage_search</mat-icon>
+          <span>No hay registros que coincidan con los filtros.</span>
+        </div>
+      } @else {
+        <table mat-table [dataSource]="entradas()" class="tabla-completa">
+          <ng-container matColumnDef="fecha">
+            <th mat-header-cell *matHeaderCellDef>Fecha</th>
+            <td mat-cell *matCellDef="let entrada">{{ deFechaHoraApi(entrada.fecha) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="usuario">
+            <th mat-header-cell *matHeaderCellDef>Usuario</th>
+            <td mat-cell *matCellDef="let entrada">{{ entrada.usuario }}</td>
+          </ng-container>
+          <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef>Acción</th>
+            <td mat-cell *matCellDef="let entrada">{{ entrada.accion }}</td>
+          </ng-container>
+          <ng-container matColumnDef="entidad">
+            <th mat-header-cell *matHeaderCellDef>Entidad</th>
+            <td mat-cell *matCellDef="let entrada">{{ entrada.entidad }}</td>
+          </ng-container>
+          <ng-container matColumnDef="detalle">
+            <th mat-header-cell *matHeaderCellDef>Detalle</th>
+            <td mat-cell *matCellDef="let entrada">{{ entrada.detalle ?? '—' }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+          <tr mat-row *matRowDef="let fila; columns: columnas"></tr>
+        </table>
+      }
+
+      <mat-paginator
+        [length]="total()"
+        [pageIndex]="indicePagina()"
+        [pageSize]="tamanioPagina()"
+        [pageSizeOptions]="[10, 25, 50]"
+        (page)="cambiarPagina($event)"
+      />
+    </mat-card-content>
+  </mat-card>
+</section>

@@ -58,6 +58,21 @@ export class SesionService {
     this._usuario.set(usuario);
   }
 
+  /**
+   * Reemplaza los datos del usuario logueado sin tocar el token.
+   *
+   * La usa "Mis datos" del paciente después de guardar: si cambió el email o
+   * la cobertura, el resto de la app (el resumen de la solicitud de turno, por
+   * ejemplo) tiene que ver el dato nuevo sin cerrar y abrir sesión.
+   *
+   * @param usuario Datos actualizados que devolvió el backend.
+   */
+  actualizarUsuario(usuario: Usuario): void {
+    if (!this._token()) return;
+    localStorage.setItem(CLAVE_USUARIO, JSON.stringify(usuario));
+    this._usuario.set(usuario);
+  }
+
   /** Cierra la sesión: borra el token y el usuario del navegador y de memoria. */
   cerrar(): void {
     localStorage.removeItem(CLAVE_TOKEN);

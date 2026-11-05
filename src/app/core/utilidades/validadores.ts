@@ -41,3 +41,68 @@ export function maxBytes(maximo: number): ValidatorFn {
     return bytes > maximo ? { maxBytes: { maximo } } : null;
   };
 }
+
+/**
+ * Mismo patrón de email que usa el backend. `Validators.email` de Angular
+ * acepta `usuario@dominio` sin punto, que el backend rechaza: con los dos
+ * juntos, lo que pasa en el front también pasa en el back.
+ */
+export const PATRON_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Validador de GRUPO: exige que dos campos tengan el mismo valor.
+ *
+ * Lo usan "repetir contraseña" del formulario de paciente y de "Mis datos"
+ * (la consigna pide validar que coincidan antes de enviar). Va en el grupo y
+ * no en un campo porque depende de dos controles a la vez.
+ *
+ * El error se marca TAMBIÉN en el control de confirmación, para que su
+ * `mat-error` lo muestre debajo del campo (Material solo muestra los errores
+ * del control, no los del grupo).
+ *
+ * @param campo Nombre del control original (por ejemplo `password`).
+ * @param confirmacion Nombre del control que lo repite (`repetirPassword`).
+ * @returns El validador, que devuelve `{ noCoinciden: true }` si difieren.
+ */
+export function coincidenCampos(campo: string, confirmacion: string): ValidatorFn {
+  return (grupo: AbstractControl): ValidationErrors | null => {
+    const original = grupo.get(campo);
+    const repetido = grupo.get(confirmacion);
+    if (!original || !repetido) return null;
+
+    const difieren = (original.value ?? '') !== (repetido.value ?? '');
+    const erroresActuales = repetido.errors ?? {};
+
+    if (difieren) {
+      repetido.setErrors({ ...erroresActuales, noCoinciden: true });
+      return { noCoinciden: true };
+    }
+    // Si ya coinciden, se quita solo este error y se conservan los demás.
+    if ('noCoinciden' in erroresActuales) {
+      const { noCoinciden: _quitado, ...resto } = erroresActuales;
+      repetido.setErrors(Object.keys(resto).length > 0 ? resto : null);
+    }
+    return null;
+  };
+}
+
+/**
+ * Validador de GRUPO: exige que la hora de salida sea posterior a la de
+ * entrada (formato `HH:MM`).
+ *
+ * Lo usa el formulario de rangos horarios de la agenda: la consigna pide
+ * validarlo "antes de enviar". Las horas se comparan como texto porque
+ * `HH:MM` con dos dígitos ordena igual que el reloj.
+ *
+ * @returns `{ horarioInvertido: true }` si la salida no es posterior.
+ */
+export const salidaPosteriorAEntrada: ValidatorFn = (
+  grupo: AbstractControl,
+): ValidationErrors | null => {
+  const entrada: unknown = grupo.get('hora_entrada')?.value;
+  const salida: unknown = grupo.get('hora_salida')?.value;
+  if (typeof entrada !== 'string' || typeof salida !== 'string' || !entrada || !salida) {
+    return null;
+  }
+  return salida > entrada ? null : { horarioInvertido: true };
+};

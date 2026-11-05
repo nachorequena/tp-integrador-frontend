@@ -1,0 +1,178 @@
+<!-- Alta o edición de usuario. El submit llama a guardar(). Los campos de
+     sede / especialidades / cobertura aparecen según rolElegido(). -->
+<h2 mat-dialog-title>{{ esEdicion ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+
+<form [formGroup]="formulario" (ngSubmit)="guardar()">
+  <mat-dialog-content class="formulario-dialogo">
+    @if (guardando()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+    @if (error()) {
+      <p class="error-servidor" role="alert">
+        <mat-icon>error</mat-icon>
+        {{ error() }}
+      </p>
+    }
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo de usuario</mat-label>
+      <mat-select formControlName="rol">
+        @for (rol of roles; track rol) {
+          <mat-option [value]="rol">{{ NOMBRE_ROL[rol] }}</mat-option>
+        }
+      </mat-select>
+      @if (esEdicion) {
+        <mat-hint>El tipo de un usuario existente no se puede cambiar.</mat-hint>
+      }
+      @if (formulario.controls.rol.hasError('required')) {
+        <mat-error>Elegí el tipo de usuario.</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="fila-campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="nombre" />
+        @if (formulario.controls.nombre.hasError('required')) {
+          <mat-error>Ingresá el nombre.</mat-error>
+        } @else if (formulario.controls.nombre.hasError('maxlength')) {
+          <mat-error>Máximo 30 caracteres.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Apellido</mat-label>
+        <input matInput formControlName="apellido" />
+        @if (formulario.controls.apellido.hasError('required')) {
+          <mat-error>Ingresá el apellido.</mat-error>
+        } @else if (formulario.controls.apellido.hasError('maxlength')) {
+          <mat-error>Máximo 30 caracteres.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="fila-campos">
+      <mat-form-field appearance="outline">
+        <mat-label>DNI</mat-label>
+        <input matInput formControlName="dni" inputmode="numeric" maxlength="8" />
+        @if (formulario.controls.dni.hasError('required')) {
+          <mat-error>Ingresá el DNI.</mat-error>
+        } @else if (formulario.controls.dni.hasError('pattern')) {
+          <mat-error>Debe tener 7 u 8 números, sin puntos.</mat-error>
+        } @else if (formulario.controls.dni.hasError('servidor')) {
+          <mat-error>{{ formulario.controls.dni.getError('servidor') }}</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Teléfono</mat-label>
+        <input matInput formControlName="telefono" inputmode="tel" maxlength="10" />
+        @if (formulario.controls.telefono.hasError('required')) {
+          <mat-error>Ingresá el teléfono.</mat-error>
+        } @else if (formulario.controls.telefono.hasError('pattern')) {
+          <mat-error>Solo números, hasta 10.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email" />
+      @if (formulario.controls.email.hasError('required')) {
+        <mat-error>Ingresá el email.</mat-error>
+      } @else if (
+        formulario.controls.email.hasError('email') || formulario.controls.email.hasError('pattern')
+      ) {
+        <mat-error>El email no tiene un formato válido.</mat-error>
+      } @else if (formulario.controls.email.hasError('maxlength')) {
+        <mat-error>Máximo 30 caracteres.</mat-error>
+      } @else if (formulario.controls.email.hasError('servidor')) {
+        <mat-error>{{ formulario.controls.email.getError('servidor') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="fila-campos">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha de nacimiento</mat-label>
+        <input
+          matInput
+          [matDatepicker]="calendario"
+          [max]="hoy"
+          formControlName="fecha_nacimiento"
+          placeholder="dd/mm/aaaa"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="calendario" />
+        <mat-datepicker #calendario startView="multi-year" />
+        @if (formulario.controls.fecha_nacimiento.hasError('matDatepickerParse')) {
+          <mat-error>Fecha inválida. Usá el formato dd/mm/aaaa.</mat-error>
+        } @else if (formulario.controls.fecha_nacimiento.hasError('required')) {
+          <mat-error>Ingresá la fecha de nacimiento.</mat-error>
+        } @else if (formulario.controls.fecha_nacimiento.hasError('matDatepickerMax')) {
+          <mat-error>La fecha no puede ser futura.</mat-error>
+        }
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>{{ esEdicion ? 'Nueva contraseña (opcional)' : 'Contraseña' }}</mat-label>
+        <input matInput formControlName="password" type="password" autocomplete="new-password" />
+        @if (esEdicion) {
+          <mat-hint>Dejala vacía para no cambiarla</mat-hint>
+        }
+        @if (formulario.controls.password.hasError('required')) {
+          <mat-error>Ingresá una contraseña.</mat-error>
+        } @else if (formulario.controls.password.hasError('minlength')) {
+          <mat-error>Debe tener al menos 6 caracteres.</mat-error>
+        } @else if (formulario.controls.password.hasError('maxBytes')) {
+          <mat-error>Es demasiado larga.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Operador y médico: sede obligatoria. El administrador no tiene sede. -->
+    @if (rolElegido() === 'operador' || rolElegido() === 'medico') {
+      <mat-form-field appearance="outline">
+        <mat-label>Sede</mat-label>
+        <mat-select formControlName="id_sede">
+          @for (sede of datos.sedes; track sede.id) {
+            <mat-option [value]="sede.id">{{ sede.nombre }}</mat-option>
+          }
+        </mat-select>
+        @if (formulario.controls.id_sede.hasError('required')) {
+          <mat-error>Elegí la sede.</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <!-- Médico: una o más especialidades (medico_especialidad). -->
+    @if (rolElegido() === 'medico') {
+      <mat-form-field appearance="outline">
+        <mat-label>Especialidades</mat-label>
+        <mat-select formControlName="especialidades" multiple>
+          @for (especialidad of datos.especialidades; track especialidad.id) {
+            <mat-option [value]="especialidad.id">{{ especialidad.descripcion }}</mat-option>
+          }
+        </mat-select>
+        @if (formulario.controls.especialidades.hasError('required')) {
+          <mat-error>Elegí al menos una especialidad.</mat-error>
+        }
+      </mat-form-field>
+    }
+
+    <!-- Paciente (solo en edición): cobertura obligatoria. -->
+    @if (rolElegido() === 'paciente') {
+      <mat-form-field appearance="outline">
+        <mat-label>Cobertura</mat-label>
+        <mat-select formControlName="id_cobertura">
+          @for (cobertura of datos.coberturas; track cobertura.id) {
+            <mat-option [value]="cobertura.id">{{ cobertura.nombre }}</mat-option>
+          }
+        </mat-select>
+        @if (formulario.controls.id_cobertura.hasError('required')) {
+          <mat-error>Elegí la cobertura.</mat-error>
+        }
+      </mat-form-field>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Cancelar</button>
+    <button mat-flat-button type="submit" [disabled]="guardando()">Guardar</button>
+  </mat-dialog-actions>
+</form>

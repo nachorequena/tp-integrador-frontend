@@ -1,0 +1,174 @@
+<!-- Formulario de alta de paciente. El submit llama a enviar(), que usa la
+     función `guardar` que pasó la pantalla (registro u operador). -->
+@if (enviando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+<form [formGroup]="formulario" (ngSubmit)="enviar()">
+  @if (error()) {
+    <p class="error-servidor" role="alert">
+      <mat-icon>error</mat-icon>
+      {{ error() }}
+    </p>
+  }
+
+  <div class="fila-campos">
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" autocomplete="given-name" />
+      @if (formulario.controls.nombre.hasError('required')) {
+        <mat-error>Ingresá el nombre.</mat-error>
+      } @else if (formulario.controls.nombre.hasError('maxlength')) {
+        <mat-error>Máximo 30 caracteres.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Apellido</mat-label>
+      <input matInput formControlName="apellido" autocomplete="family-name" />
+      @if (formulario.controls.apellido.hasError('required')) {
+        <mat-error>Ingresá el apellido.</mat-error>
+      } @else if (formulario.controls.apellido.hasError('maxlength')) {
+        <mat-error>Máximo 30 caracteres.</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="fila-campos">
+    <mat-form-field appearance="outline">
+      <mat-label>DNI</mat-label>
+      <input matInput formControlName="dni" inputmode="numeric" maxlength="8" />
+      <mat-hint>Solo números, sin puntos</mat-hint>
+      @if (formulario.controls.dni.hasError('required')) {
+        <mat-error>Ingresá el DNI.</mat-error>
+      } @else if (formulario.controls.dni.hasError('pattern')) {
+        <mat-error>Debe tener 7 u 8 números, sin puntos.</mat-error>
+      } @else if (formulario.controls.dni.hasError('servidor')) {
+        <mat-error>{{ formulario.controls.dni.getError('servidor') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Teléfono</mat-label>
+      <input matInput formControlName="telefono" inputmode="tel" maxlength="10" autocomplete="tel" />
+      <mat-hint>Solo números, hasta 10</mat-hint>
+      @if (formulario.controls.telefono.hasError('required')) {
+        <mat-error>Ingresá el teléfono.</mat-error>
+      } @else if (formulario.controls.telefono.hasError('pattern')) {
+        <mat-error>Solo números, hasta 10.</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" type="email" autocomplete="email" />
+    @if (formulario.controls.email.hasError('required')) {
+      <mat-error>Ingresá el email.</mat-error>
+    } @else if (
+      formulario.controls.email.hasError('email') || formulario.controls.email.hasError('pattern')
+    ) {
+      <mat-error>El email no tiene un formato válido.</mat-error>
+    } @else if (formulario.controls.email.hasError('maxlength')) {
+      <mat-error>Máximo 30 caracteres.</mat-error>
+    } @else if (formulario.controls.email.hasError('servidor')) {
+      <mat-error>{{ formulario.controls.email.getError('servidor') }}</mat-error>
+    }
+  </mat-form-field>
+
+  <div class="fila-campos">
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input
+        matInput
+        formControlName="password"
+        [type]="verPassword() ? 'text' : 'password'"
+        autocomplete="new-password"
+      />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="verPassword.set(!verPassword())"
+        [attr.aria-label]="verPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+      >
+        <mat-icon>{{ verPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-hint>Al menos 6 caracteres</mat-hint>
+      @if (formulario.controls.password.hasError('required')) {
+        <mat-error>Elegí una contraseña.</mat-error>
+      } @else if (formulario.controls.password.hasError('minlength')) {
+        <mat-error>Debe tener al menos 6 caracteres.</mat-error>
+      } @else if (formulario.controls.password.hasError('maxBytes')) {
+        <mat-error>Es demasiado larga.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Repetir contraseña</mat-label>
+      <input
+        matInput
+        formControlName="repetirPassword"
+        [type]="verPassword() ? 'text' : 'password'"
+        autocomplete="new-password"
+      />
+      @if (formulario.controls.repetirPassword.hasError('required')) {
+        <mat-error>Repetí la contraseña.</mat-error>
+      } @else if (formulario.controls.repetirPassword.hasError('noCoinciden')) {
+        <mat-error>Las contraseñas no coinciden.</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <div class="fila-campos">
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha de nacimiento</mat-label>
+      <input
+        matInput
+        [matDatepicker]="calendario"
+        [max]="hoy"
+        formControlName="fecha_nacimiento"
+        placeholder="dd/mm/aaaa"
+      />
+      <mat-datepicker-toggle matIconSuffix [for]="calendario" />
+      <mat-datepicker #calendario startView="multi-year" />
+      @if (formulario.controls.fecha_nacimiento.hasError('matDatepickerParse')) {
+        <mat-error>Fecha inválida. Usá el formato dd/mm/aaaa.</mat-error>
+      } @else if (formulario.controls.fecha_nacimiento.hasError('required')) {
+        <mat-error>Ingresá la fecha de nacimiento.</mat-error>
+      } @else if (formulario.controls.fecha_nacimiento.hasError('matDatepickerMax')) {
+        <mat-error>La fecha no puede ser futura.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Cobertura</mat-label>
+      <mat-select formControlName="id_cobertura">
+        @for (cobertura of coberturas(); track cobertura.id) {
+          <mat-option [value]="cobertura.id">{{ cobertura.nombre }}</mat-option>
+        }
+      </mat-select>
+      @if (cargandoCoberturas()) {
+        <mat-hint>Cargando coberturas…</mat-hint>
+      }
+      @if (formulario.controls.id_cobertura.hasError('required')) {
+        <mat-error>Elegí la cobertura.</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  @if (errorCoberturas()) {
+    <p class="error-servidor" role="alert">
+      <mat-icon>error</mat-icon>
+      No se pudieron cargar las coberturas: {{ errorCoberturas() }}
+      <button mat-button type="button" (click)="cargarCoberturas()">Reintentar</button>
+    </p>
+  }
+
+  <!-- Botón de envío + acciones extra que agrega la pantalla (por ejemplo,
+       "Ya tengo cuenta" en el registro) con <ng-content>. -->
+  <div class="acciones-formulario">
+    <button mat-flat-button type="submit" [disabled]="enviando()">{{ textoBoton() }}</button>
+    <ng-content />
+  </div>
+</form>

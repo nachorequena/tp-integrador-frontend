@@ -1,0 +1,84 @@
+<section class="pagina">
+  <header class="encabezado-pagina">
+    <h1>Mis turnos</h1>
+    <a mat-flat-button routerLink="/paciente/solicitar-turno">
+      <mat-icon>add</mat-icon>
+      Solicitar turno
+    </a>
+  </header>
+
+  @if (cargando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  @if (error()) {
+    <p class="error-servidor" role="alert">
+      <mat-icon>error</mat-icon>
+      {{ error() }}
+      <button mat-button (click)="cargar()">Reintentar</button>
+    </p>
+  } @else if (!cargando() && turnos().length === 0) {
+    <div class="estado-vacio">
+      <mat-icon>event_note</mat-icon>
+      <span>Todavía no tenés turnos.</span>
+    </div>
+  } @else {
+    <!-- Un panel por turno, en el orden del backend (más próximo primero). -->
+    <mat-accordion multi>
+      @for (turno of turnos(); track turno.id) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{ deFechaApi(turno.fecha) }} · {{ turno.hora }} · {{ turno.especialidad }}
+            </mat-panel-title>
+            <mat-panel-description>
+              <span class="chip-estado" [class]="turno.estado">{{ NOMBRE_ESTADO[turno.estado] }}</span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <dl class="datos-detalle">
+            <dt>Fecha</dt>
+            <dd>{{ aDate(turno.fecha) | date: 'fullDate' }} a las {{ turno.hora }}</dd>
+            <dt>Especialista</dt>
+            <dd>{{ turno.medico }}</dd>
+            <dt>Especialidad</dt>
+            <dd>{{ turno.especialidad }}</dd>
+            <dt>Sede</dt>
+            <dd>{{ turno.sede }}</dd>
+            <dt>Nota</dt>
+            <dd>{{ turno.nota || '—' }}</dd>
+            <dt>Cobertura</dt>
+            <dd>{{ turno.cobertura }}</dd>
+          </dl>
+
+          <!-- Turno atendido: resumen del historial clínico cargado por el médico. -->
+          @if (turno.estado === 'atendido') {
+            <h3 class="titulo-historial">Resumen de la atención</h3>
+            @if (turno.diagnostico) {
+              <dl class="datos-detalle">
+                <dt>Diagnóstico</dt>
+                <dd>{{ turno.diagnostico }}</dd>
+                <dt>Tratamiento</dt>
+                <dd>{{ turno.tratamiento ?? '—' }}</dd>
+                <dt>Observaciones</dt>
+                <dd>{{ turno.observaciones ?? '—' }}</dd>
+              </dl>
+            } @else {
+              <p>El médico todavía no cargó el historial clínico de este turno.</p>
+            }
+          }
+
+          <!-- Solo los confirmados se pueden cancelar → cancelar(turno). -->
+          @if (turno.estado === 'confirmado') {
+            <mat-action-row>
+              <button mat-button (click)="cancelar(turno)">
+                <mat-icon>event_busy</mat-icon>
+                Cancelar turno
+              </button>
+            </mat-action-row>
+          }
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
+  }
+</section>

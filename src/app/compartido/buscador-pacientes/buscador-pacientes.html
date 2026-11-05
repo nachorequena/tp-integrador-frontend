@@ -1,0 +1,51 @@
+<!-- Buscador de pacientes: campo + botón (dispara buscar()), y la lista de
+     resultados donde cada ítem llama a elegir(). -->
+<form class="barra-filtros" (ngSubmit)="buscar()">
+  <mat-form-field appearance="outline">
+    <mat-label>DNI o apellido</mat-label>
+    <input matInput [formControl]="busqueda" autocomplete="off" />
+    @if (busqueda.hasError('required')) {
+      <mat-error>Ingresá un DNI o un apellido.</mat-error>
+    } @else if (busqueda.hasError('minlength')) {
+      <mat-error>Escribí al menos 2 caracteres.</mat-error>
+    }
+  </mat-form-field>
+  <button mat-flat-button type="submit" [disabled]="buscando()">
+    <mat-icon>search</mat-icon>
+    Buscar
+  </button>
+</form>
+
+@if (buscando()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (error()) {
+  <p class="error-servidor" role="alert">
+    <mat-icon>error</mat-icon>
+    {{ error() }}
+  </p>
+}
+
+<!-- null = todavía no se buscó; [] = se buscó y no hubo resultados. -->
+@if (resultados(); as lista) {
+  @if (lista.length === 0) {
+    <div class="estado-vacio">
+      <mat-icon>person_search</mat-icon>
+      <span>No se encontraron pacientes con ese DNI o apellido.</span>
+    </div>
+  } @else {
+    <mat-nav-list>
+      @for (paciente of lista; track paciente.id) {
+        <a mat-list-item (click)="elegir(paciente)">
+          <mat-icon matListItemIcon>person</mat-icon>
+          <span matListItemTitle>{{ paciente.apellido }}, {{ paciente.nombre }}</span>
+          <span matListItemLine>
+            DNI {{ paciente.dni }} · Nac. {{ deFechaApi(paciente.fecha_nacimiento) }} ·
+            {{ paciente.cobertura ?? 'Sin cobertura' }}
+          </span>
+        </a>
+      }
+    </mat-nav-list>
+  }
+}

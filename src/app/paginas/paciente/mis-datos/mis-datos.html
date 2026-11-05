@@ -1,0 +1,100 @@
+<mat-card class="tarjeta-formulario" appearance="outlined">
+  @if (cargando() || guardando()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  <mat-card-header>
+    <mat-icon mat-card-avatar>manage_accounts</mat-icon>
+    <mat-card-title>Mis datos personales</mat-card-title>
+    <mat-card-subtitle>Podés modificar email, teléfono, cobertura y contraseña</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (error()) {
+      <p class="error-servidor" role="alert">
+        <mat-icon>error</mat-icon>
+        {{ error() }}
+        @if (!usuario()) {
+          <button mat-button (click)="cargar()">Reintentar</button>
+        }
+      </p>
+    }
+
+    @if (usuario(); as datos) {
+      <!-- Datos de solo lectura: no se pueden modificar desde acá. -->
+      <dl class="datos-detalle datos-lectura">
+        <dt>Nombre</dt>
+        <dd>{{ datos.nombre }} {{ datos.apellido }}</dd>
+        <dt>DNI</dt>
+        <dd>{{ datos.dni }}</dd>
+        <dt>Fecha de nacimiento</dt>
+        <dd>{{ deFechaApi(datos.fecha_nacimiento) }}</dd>
+      </dl>
+
+      <!-- Campos editables. El submit llama a guardar(). -->
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" autocomplete="email" />
+          @if (formulario.controls.email.hasError('required')) {
+            <mat-error>Ingresá tu email.</mat-error>
+          } @else if (
+            formulario.controls.email.hasError('email') || formulario.controls.email.hasError('pattern')
+          ) {
+            <mat-error>El email no tiene un formato válido.</mat-error>
+          } @else if (formulario.controls.email.hasError('maxlength')) {
+            <mat-error>Máximo 30 caracteres.</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="fila-campos">
+          <mat-form-field appearance="outline">
+            <mat-label>Teléfono</mat-label>
+            <input matInput formControlName="telefono" inputmode="tel" maxlength="10" />
+            @if (formulario.controls.telefono.hasError('required')) {
+              <mat-error>Ingresá tu teléfono.</mat-error>
+            } @else if (formulario.controls.telefono.hasError('pattern')) {
+              <mat-error>Solo números, hasta 10.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Cobertura</mat-label>
+            <mat-select formControlName="id_cobertura">
+              @for (cobertura of coberturas(); track cobertura.id) {
+                <mat-option [value]="cobertura.id">{{ cobertura.nombre }}</mat-option>
+              }
+            </mat-select>
+            @if (formulario.controls.id_cobertura.hasError('required')) {
+              <mat-error>Elegí tu cobertura.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="fila-campos">
+          <mat-form-field appearance="outline">
+            <mat-label>Nueva contraseña (opcional)</mat-label>
+            <input matInput formControlName="password" type="password" autocomplete="new-password" />
+            <mat-hint>Dejala vacía para no cambiarla</mat-hint>
+            @if (formulario.controls.password.hasError('minlength')) {
+              <mat-error>Debe tener al menos 6 caracteres.</mat-error>
+            } @else if (formulario.controls.password.hasError('maxBytes')) {
+              <mat-error>Es demasiado larga.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Repetir nueva contraseña</mat-label>
+            <input matInput formControlName="repetirPassword" type="password" autocomplete="new-password" />
+            @if (formulario.controls.repetirPassword.hasError('noCoinciden')) {
+              <mat-error>Las contraseñas no coinciden.</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="acciones-formulario">
+          <button mat-flat-button type="submit" [disabled]="guardando()">Guardar cambios</button>
+        </div>
+      </form>
+    }
+  </mat-card-content>
+</mat-card>
