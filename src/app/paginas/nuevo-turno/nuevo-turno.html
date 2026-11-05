@@ -2,22 +2,6 @@
   TEMPLATE DE LA SOLICITUD DE TURNO (lógica en nuevo-turno.ts)
   ==========================================================
 
-  Sintaxis de Angular que aparece en este archivo:
-    {{ x }}              Muestra el valor de x (una propiedad o signal del .ts).
-    @if (cond) { … }     Dibuja el bloque solo si la condición es verdadera.
-    @else { … }          Lo que se dibuja si no se cumple el @if.
-    @for (x of lista(); track x.id) { … }
-                         Repite el bloque por cada elemento de la lista.
-                         `track` le dice a Angular cómo identificar cada uno.
-    [propiedad]="expr"   Pasa un valor del .ts a un componente o elemento
-                         (por ejemplo [disabled]="enviando()").
-    (evento)="metodo()"  Ejecuta un método del .ts cuando pasa el evento
-                         (por ejemplo (ngSubmit)="confirmar()").
-    [formGroup]="x"      Conecta este <form> con el FormGroup x del .ts.
-    formControlName="y"  Conecta este campo con el campo y de ese FormGroup:
-                         lo que elige el usuario se guarda ahí solo.
-    x | date: '…'        "Pipe": transforma un valor al mostrarlo (acá, una
-                         fecha a texto en español).
 -->
 <section class="pagina">
   <header class="encabezado-pagina">

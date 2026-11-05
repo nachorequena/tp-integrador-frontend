@@ -35,34 +35,6 @@
  *   - Pide datos a: `EspecialidadService`, `SedeService`, `CoberturaService`,
  *     `MedicoService` y `TurnoService` (`core/servicios/`).
  *   - Al confirmar avisa a `NotificacionService` (campana del encabezado).
- *
- * ── GUÍA RÁPIDA DE LOS CONCEPTOS DE ANGULAR QUE APARECEN ACÁ ────────────────
- *
- *   @Component        "Decorador": le dice a Angular que esta clase es una
- *                     pantalla, cuál es su HTML y qué otros componentes usa.
- *   inject(X)         Pide a Angular una instancia de X (un servicio). Angular
- *                     crea una sola y la comparte en toda la app.
- *   signal(valor)     Una "caja" con un valor. Se lee llamándola: `cargando()`.
- *                     Se cambia con `.set(nuevo)`. Cuando cambia, el HTML que
- *                     la usa se vuelve a dibujar solo.
- *   computed(() => …) Un valor calculado a partir de otras signals. Se
- *                     recalcula solo cuando cambia alguna de las que usa.
- *   FormGroup /       Formularios "reactivos": el formulario es un objeto en el
- *   FormControl       código (no solo HTML). Cada campo tiene su valor, sus
- *                     validadores y su estado (`valid`, `invalid`, `touched`).
- *   Validators.X      Reglas de validación de Angular (required, maxLength…).
- *   Observable        Una respuesta que llega "más tarde" (por ejemplo, un
- *                     pedido HTTP). No hace nada hasta que alguien llama a
- *                     `.subscribe({ next, error })`:
- *                       - `next`  se ejecuta cuando llega la respuesta OK;
- *                       - `error` se ejecuta si el pedido falla (400, 409,
- *                         backend apagado…). Cumple el rol de un `catch`.
- *   .pipe(…)          Encadena transformaciones sobre un Observable antes de
- *                     suscribirse (por ejemplo `catchError`).
- *   valueChanges      Observable que emite cada vez que el usuario cambia el
- *                     valor de un campo del formulario.
- *   takeUntilDestroyed() Corta esa suscripción cuando se sale de la pantalla,
- *                     para no dejar escuchas "colgadas" en memoria.
  */
 
 import { DatePipe } from '@angular/common';
