@@ -25,7 +25,13 @@ export const sesionGuard: CanActivateFn = (_ruta, estado) => {
   const sesion = inject(SesionService);
   const router = inject(Router);
 
+  // Un guard devuelve:
+  //   - `true`             → "pasá": Angular carga la pantalla;
+  //   - un `UrlTree`       → "no pasás, andá a esta otra URL" (redirección).
+  // Si hay sesión (hay usuario guardado en SesionService), se deja pasar.
   if (sesion.haySesion()) return true;
+  // Si no hay sesión: al login, guardando en `?volver=` la URL que se quería
+  // abrir (por ejemplo /paciente/solicitar-turno) para volver después.
   return router.createUrlTree(['/login'], { queryParams: { volver: estado.url } });
 };
 

@@ -49,18 +49,28 @@ import { Rol } from './core/modelos/usuario';
  * @returns La ruta `/<rol>` con sus hijas y sus guards.
  */
 function seccionDeRol(rol: Rol): Route {
+  // Las opciones del menú de ese rol (por ejemplo, para 'paciente':
+  // solicitar-turno, mis-turnos, historial, mis-datos).
   const opciones = MENU_POR_ROL[rol];
   return {
+    // Prefijo de la URL: /paciente, /medico, /operador o /admin.
     path: rol,
+    // Guards que corren ANTES de entrar a cualquier ruta de la sección, en
+    // orden: primero "¿hay sesión?" y después "¿es de este rol?".
     canActivate: [sesionGuard, rolGuard(rol)],
     children: [
       // `/paciente` sola lleva a la primera opción de la sección.
       { path: '', pathMatch: 'full', redirectTo: opciones[0].segmento },
+      // `.map` convierte CADA opción del menú en una ruta hija. Para
+      // "Solicitar turno" queda:
+      //   { path: 'solicitar-turno', title: 'Solicitar turno | Clínica Virtual',
+      //     loadComponent: () => import(...nuevo-turno) }
+      // El `...` delante "desparrama" ese array de rutas dentro de `children`.
       ...opciones.map(
         (opcion): Route => ({
           path: opcion.segmento,
-          title: `${opcion.etiqueta} | Clínica Virtual`,
-          loadComponent: opcion.cargar,
+          title: `${opcion.etiqueta} | Clínica Virtual`, // título de la pestaña
+          loadComponent: opcion.cargar, // carga la pantalla recién al entrar
         }),
       ),
     ],

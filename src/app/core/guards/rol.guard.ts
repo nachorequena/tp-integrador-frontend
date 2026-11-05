@@ -28,12 +28,19 @@ import { SesionService } from '../servicios/sesion.service';
  * @returns Un guard listo para usar en `canActivate`.
  */
 export function rolGuard(...rolesPermitidos: Rol[]): CanActivateFn {
+  // Es una "fábrica": `rolGuard('paciente')` DEVUELVE el guard (la función de
+  // abajo) configurado para ese rol. Así un solo archivo sirve para los cuatro.
+  // `...rolesPermitidos` junta todos los roles que se pasen en un array.
   return () => {
     const sesion = inject(SesionService);
     const router = inject(Router);
 
-    const rol = sesion.rol();
+    const rol = sesion.rol(); // rol del usuario logueado (o null sin sesión)
+    // Pasa si hay rol Y está en la lista de permitidos. Ejemplo: en
+    // /paciente/solicitar-turno, rolesPermitidos = ['paciente']; un médico
+    // que escriba esa URL a mano no está en la lista → no pasa.
     if (rol !== null && rolesPermitidos.includes(rol)) return true;
+    // No pasa: redirige a la pantalla "Acceso denegado".
     return router.createUrlTree(['/acceso-denegado']);
   };
 }

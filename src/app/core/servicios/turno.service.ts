@@ -46,6 +46,22 @@ export class TurnoService {
    * @returns Fechas `YYYY-MM-DD`, ordenadas.
    */
   fechasLibres(consulta: ConsultaDisponibilidad): Observable<string[]> {
+    // Cómo se lee este método (todos los del servicio siguen el mismo patrón):
+    //   this.http.get<T>(url, opciones)
+    //     Arma un pedido GET con el HttpClient de Angular. `<T>` es el tipo
+    //     de lo que se espera recibir: la respuesta uniforme del backend
+    //     `{ codigo, estado, datos }` con un array de fechas en `datos`.
+    //     El pedido NO sale todavía: sale cuando alguien hace `.subscribe()`
+    //     (en este caso, `pedir()` de la pantalla nuevo-turno).
+    //   params: aParametros(consulta)
+    //     Convierte { id_medico: 3, id_especialidad: 1, id_sede: 2 } en
+    //     `?id_medico=3&id_especialidad=1&id_sede=2` (core/utilidades/http.ts).
+    //   .pipe(datosDe())
+    //     Antes de entregar la respuesta, se queda solo con `datos`: la
+    //     pantalla recibe directamente ["2026-11-06", ...].
+    //   El token NO se agrega acá: lo agrega solo `token.interceptor.ts`.
+    //   Si el backend responde un error, el Observable falla y la pantalla lo
+    //   recibe en su `error:` del subscribe.
     return this.http
       .get<RespuestaApi<string[]>>(`${this.urlDisponibilidad}/fechas`, {
         params: aParametros(consulta),
@@ -58,6 +74,8 @@ export class TurnoService {
    * confirmados, cada 30 minutos).
    */
   horariosLibres(consulta: ConsultaDisponibilidad, fecha: string): Observable<HorarioLibre[]> {
+    // `{ ...consulta, fecha }` arma un objeto nuevo con los tres ids de la
+    // consulta MÁS la fecha → `?id_medico=..&id_especialidad=..&id_sede=..&fecha=..`
     return this.http
       .get<RespuestaApi<HorarioLibre[]>>(`${this.urlDisponibilidad}/horarios`, {
         params: aParametros({ ...consulta, fecha }),
@@ -72,6 +90,12 @@ export class TurnoService {
    *   mientras tanto: la pantalla lo informa y vuelve al paso de horario.
    */
   crear(datos: DatosNuevoTurno): Observable<Turno> {
+    // POST {apiUrl}/turnos con `datos` como cuerpo JSON:
+    //   { id_medico, id_especialidad, id_sede, fecha, hora, nota, id_paciente? }
+    // HttpClient convierte el objeto a JSON solo. Si el backend responde 201,
+    // `datosDe()` entrega el turno creado; si responde 400/403/409, el
+    // Observable falla y la pantalla lo maneja en su `error:`.
+    // Del lado del backend lo recibe `turno.controller.ts` → `crear`.
     return this.http.post<RespuestaApi<Turno>>(this.url, datos).pipe(datosDe());
   }
 
